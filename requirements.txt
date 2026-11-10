@@ -1,0 +1,9 @@
+faster-whisper
+vosk
+jiwer
+librosa
+soundfile
+numpy
+pandas
+gTTS
+piper-tts

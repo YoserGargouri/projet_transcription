@@ -1,0 +1,29 @@
+
+# Environnement Python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Modèles volumineux
+models/
+
+# Audios bruts
+data/audio/*
+!data/audio/test_samples/
+!data/audio/test_samples/**
+
+# Données temporaires
+data/tmp/
+data/raw/
+
+# Résultats générés
+results/
+eval/tmp/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Système
+.DS_Store
+Thumbs.db
