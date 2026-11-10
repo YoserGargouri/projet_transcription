@@ -1,0 +1,255 @@
+exam_a,libelle_a,exam_b,libelle_b,type_confusion,question_desambiguisation
+ECH_CDE_G,Échographie coude gauche,ECH_CDE_D,Échographie coude droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+ECH_CHE_G,Échographie cheville gauche,ECH_CHE_D,Échographie cheville droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+ECH_EPA_G,Échographie épaule gauche,ECH_EPA_D,Échographie épaule droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+ECH_GEN_G,Échographie genou gauche,ECH_GEN_D,Échographie genou droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+ECH_HAN_G,Échographie hanche gauche,ECH_HAN_D,Échographie hanche droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+ECH_MAI_G,Échographie main gauche,ECH_MAI_D,Échographie main droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+ECH_PIE_G,Échographie pied gauche,ECH_PIE_D,Échographie pied droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+ECH_POI_G,Échographie poignet gauche,ECH_POI_D,Échographie poignet droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+ECH_SEI_G,Échographie sein gauche,ECH_SEI_D,Échographie sein droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_ABR_G,IRM avant-bras gauche,IRM_ABR_D,IRM avant-bras droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_ABR_G_INJ,IRM avant-bras gauche avec injection,IRM_ABR_D_INJ,IRM avant-bras droit avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_BRA_G,IRM bras gauche,IRM_BRA_D,IRM bras droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_BRA_G_INJ,IRM bras gauche avec injection,IRM_BRA_D_INJ,IRM bras droit avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_CDE_G,IRM coude gauche,IRM_CDE_D,IRM coude droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_CDE_G_INJ,IRM coude gauche avec injection,IRM_CDE_D_INJ,IRM coude droit avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_CHE_G,IRM cheville gauche,IRM_CHE_D,IRM cheville droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_CHE_G_INJ,IRM cheville gauche avec injection,IRM_CHE_D_INJ,IRM cheville droite avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_CUI_G,IRM cuisse gauche,IRM_CUI_D,IRM cuisse droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_CUI_G_INJ,IRM cuisse gauche avec injection,IRM_CUI_D_INJ,IRM cuisse droite avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_EPA_G,IRM épaule gauche,IRM_EPA_D,IRM épaule droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_EPA_G_INJ,IRM épaule gauche avec injection,IRM_EPA_D_INJ,IRM épaule droite avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_GEN_G,IRM genou gauche,IRM_GEN_D,IRM genou droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_GEN_G_INJ,IRM genou gauche avec injection,IRM_GEN_D_INJ,IRM genou droit avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_HAN_G,IRM hanche gauche,IRM_HAN_D,IRM hanche droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_HAN_G_INJ,IRM hanche gauche avec injection,IRM_HAN_D_INJ,IRM hanche droite avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_JAM_G,IRM jambe gauche,IRM_JAM_D,IRM jambe droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_JAM_G_INJ,IRM jambe gauche avec injection,IRM_JAM_D_INJ,IRM jambe droite avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_MAI_G,IRM main gauche,IRM_MAI_D,IRM main droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_MAI_G_INJ,IRM main gauche avec injection,IRM_MAI_D_INJ,IRM main droite avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_PIE_G,IRM pied gauche,IRM_PIE_D,IRM pied droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_PIE_G_INJ,IRM pied gauche avec injection,IRM_PIE_D_INJ,IRM pied droit avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_POI_G,IRM poignet gauche,IRM_POI_D,IRM poignet droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_POI_G_INJ,IRM poignet gauche avec injection,IRM_POI_D_INJ,IRM poignet droit avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_SEI_G_INJ,IRM sein gauche avec injection,IRM_SEI_D_INJ,IRM sein droit avec injection,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+MAM_SEI_G,Mammographie sein gauche,MAM_SEI_D,Mammographie sein droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_ABR_G,Radio avant-bras gauche,RX_ABR_D,Radio avant-bras droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_BRA_G,Radio bras gauche,RX_BRA_D,Radio bras droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_CDE_G,Radio coude gauche,RX_CDE_D,Radio coude droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_CHE_G,Radio cheville gauche,RX_CHE_D,Radio cheville droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_CUI_G,Radio cuisse gauche,RX_CUI_D,Radio cuisse droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_EPA_G,Radio épaule gauche,RX_EPA_D,Radio épaule droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_GEN_G,Radio genou gauche,RX_GEN_D,Radio genou droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_HAN_G,Radio hanche gauche,RX_HAN_D,Radio hanche droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_JAM_G,Radio jambe gauche,RX_JAM_D,Radio jambe droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_MAI_G,Radio main gauche,RX_MAI_D,Radio main droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_PIE_G,Radio pied gauche,RX_PIE_D,Radio pied droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+RX_POI_G,Radio poignet gauche,RX_POI_D,Radio poignet droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_ABR_G,Scanner avant-bras gauche,TDM_ABR_D,Scanner avant-bras droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_BRA_G,Scanner bras gauche,TDM_BRA_D,Scanner bras droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_CDE_G,Scanner coude gauche,TDM_CDE_D,Scanner coude droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_CHE_G,Scanner cheville gauche,TDM_CHE_D,Scanner cheville droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_CUI_G,Scanner cuisse gauche,TDM_CUI_D,Scanner cuisse droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_EPA_G,Scanner épaule gauche,TDM_EPA_D,Scanner épaule droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_GEN_G,Scanner genou gauche,TDM_GEN_D,Scanner genou droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_HAN_G,Scanner hanche gauche,TDM_HAN_D,Scanner hanche droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_JAM_G,Scanner jambe gauche,TDM_JAM_D,Scanner jambe droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_MAI_G,Scanner main gauche,TDM_MAI_D,Scanner main droite,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_PIE_G,Scanner pied gauche,TDM_PIE_D,Scanner pied droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+TDM_POI_G,Scanner poignet gauche,TDM_POI_D,Scanner poignet droit,lateralite,Votre ordonnance précise-t-elle le côté : gauche ou droit ?
+IRM_ABP_INJ,IRM abdomen-pelvis avec injection,IRM_ABP,IRM abdomen-pelvis,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_ABR_D,IRM avant-bras droit,IRM_ABR_D_INJ,IRM avant-bras droit avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_ABR_G,IRM avant-bras gauche,IRM_ABR_G_INJ,IRM avant-bras gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_BRA_D,IRM bras droit,IRM_BRA_D_INJ,IRM bras droit avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_BRA_G,IRM bras gauche,IRM_BRA_G_INJ,IRM bras gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_CDE_D,IRM coude droit,IRM_CDE_D_INJ,IRM coude droit avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_CDE_G,IRM coude gauche,IRM_CDE_G_INJ,IRM coude gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_CHE_D,IRM cheville droite,IRM_CHE_D_INJ,IRM cheville droite avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_CHE_G,IRM cheville gauche,IRM_CHE_G_INJ,IRM cheville gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_CRA,IRM crâne,IRM_CRA_INJ,IRM crâne avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_CUI_D,IRM cuisse droite,IRM_CUI_D_INJ,IRM cuisse droite avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_CUI_G,IRM cuisse gauche,IRM_CUI_G_INJ,IRM cuisse gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_EPA_D,IRM épaule droite,IRM_EPA_D_INJ,IRM épaule droite avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_EPA_G,IRM épaule gauche,IRM_EPA_G_INJ,IRM épaule gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_FAC_INJ,IRM face avec injection,IRM_FAC,IRM face,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_GEN_D,IRM genou droit,IRM_GEN_D_INJ,IRM genou droit avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_GEN_G,IRM genou gauche,IRM_GEN_G_INJ,IRM genou gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_HAN_D,IRM hanche droite,IRM_HAN_D_INJ,IRM hanche droite avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_HAN_G,IRM hanche gauche,IRM_HAN_G_INJ,IRM hanche gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_JAM_D,IRM jambe droite,IRM_JAM_D_INJ,IRM jambe droite avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_JAM_G,IRM jambe gauche,IRM_JAM_G_INJ,IRM jambe gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_MAI_D,IRM main droite,IRM_MAI_D_INJ,IRM main droite avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_MAI_G,IRM main gauche,IRM_MAI_G_INJ,IRM main gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_PIE_D,IRM pied droit,IRM_PIE_D_INJ,IRM pied droit avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_PIE_G,IRM pied gauche,IRM_PIE_G_INJ,IRM pied gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_POI_D,IRM poignet droit,IRM_POI_D_INJ,IRM poignet droit avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_POI_G,IRM poignet gauche,IRM_POI_G_INJ,IRM poignet gauche avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_RCE,IRM rachis cervical,IRM_RCE_INJ,IRM rachis cervical avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_RDO,IRM rachis dorsal,IRM_RDO_INJ,IRM rachis dorsal avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+IRM_RLO,IRM rachis lombaire,IRM_RLO_INJ,IRM rachis lombaire avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+TDM_ABP_INJ,Scanner abdomen-pelvis avec injection,TDM_ABP,Scanner abdomen-pelvis,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+TDM_COU_INJ,Scanner cou avec injection,TDM_COU,Scanner cou,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+TDM_CRA,Scanner crâne,TDM_CRA_INJ,Scanner crâne avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+TDM_THO,Scanner thorax,TDM_THO_INJ,Scanner thorax avec injection,injection,Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+ECH_ABD,Échographie abdomen,RX_ABD,Radio abdomen,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+TDM_ABP,Scanner abdomen-pelvis,IRM_ABP,IRM abdomen-pelvis,modalite,Votre ordonnance indique-t-elle un scanner ou une IRM ?
+IRM_ABR_D,IRM avant-bras droit,TDM_ABR_D,Scanner avant-bras droit,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_ABR_D,Scanner avant-bras droit,RX_ABR_D,Radio avant-bras droit,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+IRM_ABR_G,IRM avant-bras gauche,TDM_ABR_G,Scanner avant-bras gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_ABR_G,Scanner avant-bras gauche,RX_ABR_G,Radio avant-bras gauche,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+IRM_BRA_D,IRM bras droit,TDM_BRA_D,Scanner bras droit,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_BRA_D,Scanner bras droit,RX_BRA_D,Radio bras droit,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+IRM_BRA_G,IRM bras gauche,TDM_BRA_G,Scanner bras gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_BRA_G,Scanner bras gauche,RX_BRA_G,Radio bras gauche,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+ECH_CHE_D,Échographie cheville droite,RX_CHE_D,Radio cheville droite,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_CHE_D,IRM cheville droite,TDM_CHE_D,Scanner cheville droite,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_CHE_D,Radio cheville droite,TDM_CHE_D,Scanner cheville droite,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+ECH_CHE_G,Échographie cheville gauche,RX_CHE_G,Radio cheville gauche,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_CHE_G,IRM cheville gauche,TDM_CHE_G,Scanner cheville gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_CHE_G,Radio cheville gauche,TDM_CHE_G,Scanner cheville gauche,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+TDM_COU,Scanner cou,RX_COU,Radio cou,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+ECH_CDE_D,Échographie coude droit,RX_CDE_D,Radio coude droit,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_CDE_D,IRM coude droit,TDM_CDE_D,Scanner coude droit,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_CDE_D,Radio coude droit,TDM_CDE_D,Scanner coude droit,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+ECH_CDE_G,Échographie coude gauche,RX_CDE_G,Radio coude gauche,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_CDE_G,IRM coude gauche,TDM_CDE_G,Scanner coude gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_CDE_G,Radio coude gauche,TDM_CDE_G,Scanner coude gauche,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_CRA,IRM crâne,TDM_CRA,Scanner crâne,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_CRA,Scanner crâne,RX_CRA,Radio crâne,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+IRM_CUI_D,IRM cuisse droite,TDM_CUI_D,Scanner cuisse droite,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_CUI_D,Scanner cuisse droite,RX_CUI_D,Radio cuisse droite,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+IRM_CUI_G,IRM cuisse gauche,TDM_CUI_G,Scanner cuisse gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_CUI_G,Scanner cuisse gauche,RX_CUI_G,Radio cuisse gauche,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+TDM_FAC,Scanner face,IRM_FAC,IRM face,modalite,Votre ordonnance indique-t-elle un scanner ou une IRM ?
+TDM_FAC,Scanner face,RX_FAC,Radio face,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+RX_GEN_D,Radio genou droit,ECH_GEN_D,Échographie genou droit,modalite,Votre ordonnance indique-t-elle une radio ou une échographie ?
+RX_GEN_D,Radio genou droit,TDM_GEN_D,Scanner genou droit,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_GEN_D,IRM genou droit,TDM_GEN_D,Scanner genou droit,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_GEN_G,Radio genou gauche,ECH_GEN_G,Échographie genou gauche,modalite,Votre ordonnance indique-t-elle une radio ou une échographie ?
+RX_GEN_G,Radio genou gauche,TDM_GEN_G,Scanner genou gauche,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_GEN_G,IRM genou gauche,TDM_GEN_G,Scanner genou gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+ECH_HAN_D,Échographie hanche droite,RX_HAN_D,Radio hanche droite,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_HAN_D,IRM hanche droite,TDM_HAN_D,Scanner hanche droite,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_HAN_D,Radio hanche droite,TDM_HAN_D,Scanner hanche droite,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+ECH_HAN_G,Échographie hanche gauche,RX_HAN_G,Radio hanche gauche,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_HAN_G,IRM hanche gauche,TDM_HAN_G,Scanner hanche gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_HAN_G,Radio hanche gauche,TDM_HAN_G,Scanner hanche gauche,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_JAM_D,IRM jambe droite,TDM_JAM_D,Scanner jambe droite,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_JAM_D,Scanner jambe droite,RX_JAM_D,Radio jambe droite,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+IRM_JAM_G,IRM jambe gauche,TDM_JAM_G,Scanner jambe gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_JAM_G,Scanner jambe gauche,RX_JAM_G,Radio jambe gauche,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+ECH_MAI_D,Échographie main droite,RX_MAI_D,Radio main droite,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+RX_MAI_D,Radio main droite,TDM_MAI_D,Scanner main droite,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_MAI_D,IRM main droite,TDM_MAI_D,Scanner main droite,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+ECH_MAI_G,Échographie main gauche,RX_MAI_G,Radio main gauche,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+RX_MAI_G,Radio main gauche,TDM_MAI_G,Scanner main gauche,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_MAI_G,IRM main gauche,TDM_MAI_G,Scanner main gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+ECH_PIE_D,Échographie pied droit,RX_PIE_D,Radio pied droit,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_PIE_D,IRM pied droit,TDM_PIE_D,Scanner pied droit,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_PIE_D,Radio pied droit,TDM_PIE_D,Scanner pied droit,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+ECH_PIE_G,Échographie pied gauche,RX_PIE_G,Radio pied gauche,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_PIE_G,IRM pied gauche,TDM_PIE_G,Scanner pied gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_PIE_G,Radio pied gauche,TDM_PIE_G,Scanner pied gauche,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+ECH_POI_D,Échographie poignet droit,RX_POI_D,Radio poignet droit,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_POI_D,IRM poignet droit,TDM_POI_D,Scanner poignet droit,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_POI_D,Radio poignet droit,TDM_POI_D,Scanner poignet droit,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+ECH_POI_G,Échographie poignet gauche,RX_POI_G,Radio poignet gauche,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+IRM_POI_G,IRM poignet gauche,TDM_POI_G,Scanner poignet gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+RX_POI_G,Radio poignet gauche,TDM_POI_G,Scanner poignet gauche,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_RCE,IRM rachis cervical,TDM_RCE,Scanner rachis cervical,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_RCE,Scanner rachis cervical,RX_RCE,Radio rachis cervical,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+IRM_RDO,IRM rachis dorsal,TDM_RDO,Scanner rachis dorsal,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_RDO,Scanner rachis dorsal,RX_RDO,Radio rachis dorsal,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+IRM_RLO,IRM rachis lombaire,TDM_RLO,Scanner rachis lombaire,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+TDM_RLO,Scanner rachis lombaire,RX_RLO,Radio rachis lombaire,modalite,Votre ordonnance indique-t-elle un scanner ou une radio ?
+ECH_SEI_D,Échographie sein droit,MAM_SEI_D,Mammographie sein droit,modalite,Votre ordonnance indique-t-elle une échographie ou une mammographie ?
+ECH_SEI_G,Échographie sein gauche,MAM_SEI_G,Mammographie sein gauche,modalite,Votre ordonnance indique-t-elle une échographie ou une mammographie ?
+RX_THO,Radio thorax,TDM_THO,Scanner thorax,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+RX_THO,Radio thorax,ECH_THO,Échographie thorax,modalite,Votre ordonnance indique-t-elle une radio ou une échographie ?
+TDM_VCO,Scanner vaisseaux du cou,IRM_VCO,IRM vaisseaux du cou,modalite,Votre ordonnance indique-t-elle un scanner ou une IRM ?
+ECH_EPA_D,Échographie épaule droite,RX_EPA_D,Radio épaule droite,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+RX_EPA_D,Radio épaule droite,TDM_EPA_D,Scanner épaule droite,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_EPA_D,IRM épaule droite,TDM_EPA_D,Scanner épaule droite,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+ECH_EPA_G,Échographie épaule gauche,RX_EPA_G,Radio épaule gauche,modalite,Votre ordonnance indique-t-elle une échographie ou une radio ?
+RX_EPA_G,Radio épaule gauche,TDM_EPA_G,Scanner épaule gauche,modalite,Votre ordonnance indique-t-elle une radio ou un scanner ?
+IRM_EPA_G,IRM épaule gauche,TDM_EPA_G,Scanner épaule gauche,modalite,Votre ordonnance indique-t-elle une IRM ou un scanner ?
+IRM_HAN_D,IRM hanche droite,IRM_CUI_D,IRM cuisse droite,region,"Sur votre ordonnance, est-il écrit hanche ou cuisse ?"
+IRM_CUI_D,IRM cuisse droite,IRM_GEN_D,IRM genou droit,region,"Sur votre ordonnance, est-il écrit cuisse ou genou ?"
+IRM_GEN_D,IRM genou droit,IRM_JAM_D,IRM jambe droite,region,"Sur votre ordonnance, est-il écrit genou ou jambe ?"
+IRM_JAM_D,IRM jambe droite,IRM_CHE_D,IRM cheville droite,region,"Sur votre ordonnance, est-il écrit jambe ou cheville ?"
+IRM_CHE_D,IRM cheville droite,IRM_PIE_D,IRM pied droit,region,"Sur votre ordonnance, est-il écrit cheville ou pied ?"
+IRM_EPA_D,IRM épaule droite,IRM_BRA_D,IRM bras droit,region,"Sur votre ordonnance, est-il écrit épaule ou bras ?"
+IRM_BRA_D,IRM bras droit,IRM_CDE_D,IRM coude droit,region,"Sur votre ordonnance, est-il écrit bras ou coude ?"
+IRM_CDE_D,IRM coude droit,IRM_ABR_D,IRM avant-bras droit,region,"Sur votre ordonnance, est-il écrit coude ou avant-bras ?"
+IRM_ABR_D,IRM avant-bras droit,IRM_POI_D,IRM poignet droit,region,"Sur votre ordonnance, est-il écrit avant-bras ou poignet ?"
+IRM_POI_D,IRM poignet droit,IRM_MAI_D,IRM main droite,region,"Sur votre ordonnance, est-il écrit poignet ou main ?"
+IRM_HAN_G,IRM hanche gauche,IRM_CUI_G,IRM cuisse gauche,region,"Sur votre ordonnance, est-il écrit hanche ou cuisse ?"
+IRM_CUI_G,IRM cuisse gauche,IRM_GEN_G,IRM genou gauche,region,"Sur votre ordonnance, est-il écrit cuisse ou genou ?"
+IRM_GEN_G,IRM genou gauche,IRM_JAM_G,IRM jambe gauche,region,"Sur votre ordonnance, est-il écrit genou ou jambe ?"
+IRM_JAM_G,IRM jambe gauche,IRM_CHE_G,IRM cheville gauche,region,"Sur votre ordonnance, est-il écrit jambe ou cheville ?"
+IRM_CHE_G,IRM cheville gauche,IRM_PIE_G,IRM pied gauche,region,"Sur votre ordonnance, est-il écrit cheville ou pied ?"
+IRM_EPA_G,IRM épaule gauche,IRM_BRA_G,IRM bras gauche,region,"Sur votre ordonnance, est-il écrit épaule ou bras ?"
+IRM_BRA_G,IRM bras gauche,IRM_CDE_G,IRM coude gauche,region,"Sur votre ordonnance, est-il écrit bras ou coude ?"
+IRM_CDE_G,IRM coude gauche,IRM_ABR_G,IRM avant-bras gauche,region,"Sur votre ordonnance, est-il écrit coude ou avant-bras ?"
+IRM_ABR_G,IRM avant-bras gauche,IRM_POI_G,IRM poignet gauche,region,"Sur votre ordonnance, est-il écrit avant-bras ou poignet ?"
+IRM_POI_G,IRM poignet gauche,IRM_MAI_G,IRM main gauche,region,"Sur votre ordonnance, est-il écrit poignet ou main ?"
+IRM_RCE,IRM rachis cervical,IRM_RDO,IRM rachis dorsal,region,"Sur votre ordonnance, est-il écrit rachis cervical ou rachis dorsal ?"
+IRM_RDO,IRM rachis dorsal,IRM_RLO,IRM rachis lombaire,region,"Sur votre ordonnance, est-il écrit rachis dorsal ou rachis lombaire ?"
+IRM_CRA,IRM crâne,IRM_FAC,IRM face,region,"Sur votre ordonnance, est-il écrit crâne ou face ?"
+RX_GEN_D,Radio genou droit,RX_JAM_D,Radio jambe droite,region,"Sur votre ordonnance, est-il écrit genou ou jambe ?"
+RX_GEN_D,Radio genou droit,RX_CUI_D,Radio cuisse droite,region,"Sur votre ordonnance, est-il écrit genou ou cuisse ?"
+RX_MAI_D,Radio main droite,RX_POI_D,Radio poignet droit,region,"Sur votre ordonnance, est-il écrit main ou poignet ?"
+RX_EPA_D,Radio épaule droite,RX_BRA_D,Radio bras droit,region,"Sur votre ordonnance, est-il écrit épaule ou bras ?"
+RX_PIE_D,Radio pied droit,RX_CHE_D,Radio cheville droite,region,"Sur votre ordonnance, est-il écrit pied ou cheville ?"
+RX_POI_D,Radio poignet droit,RX_ABR_D,Radio avant-bras droit,region,"Sur votre ordonnance, est-il écrit poignet ou avant-bras ?"
+RX_CHE_D,Radio cheville droite,RX_JAM_D,Radio jambe droite,region,"Sur votre ordonnance, est-il écrit cheville ou jambe ?"
+RX_HAN_D,Radio hanche droite,RX_CUI_D,Radio cuisse droite,region,"Sur votre ordonnance, est-il écrit hanche ou cuisse ?"
+RX_CDE_D,Radio coude droit,RX_ABR_D,Radio avant-bras droit,region,"Sur votre ordonnance, est-il écrit coude ou avant-bras ?"
+RX_CDE_D,Radio coude droit,RX_BRA_D,Radio bras droit,region,"Sur votre ordonnance, est-il écrit coude ou bras ?"
+RX_GEN_G,Radio genou gauche,RX_JAM_G,Radio jambe gauche,region,"Sur votre ordonnance, est-il écrit genou ou jambe ?"
+RX_GEN_G,Radio genou gauche,RX_CUI_G,Radio cuisse gauche,region,"Sur votre ordonnance, est-il écrit genou ou cuisse ?"
+RX_MAI_G,Radio main gauche,RX_POI_G,Radio poignet gauche,region,"Sur votre ordonnance, est-il écrit main ou poignet ?"
+RX_EPA_G,Radio épaule gauche,RX_BRA_G,Radio bras gauche,region,"Sur votre ordonnance, est-il écrit épaule ou bras ?"
+RX_PIE_G,Radio pied gauche,RX_CHE_G,Radio cheville gauche,region,"Sur votre ordonnance, est-il écrit pied ou cheville ?"
+RX_POI_G,Radio poignet gauche,RX_ABR_G,Radio avant-bras gauche,region,"Sur votre ordonnance, est-il écrit poignet ou avant-bras ?"
+RX_CHE_G,Radio cheville gauche,RX_JAM_G,Radio jambe gauche,region,"Sur votre ordonnance, est-il écrit cheville ou jambe ?"
+RX_HAN_G,Radio hanche gauche,RX_CUI_G,Radio cuisse gauche,region,"Sur votre ordonnance, est-il écrit hanche ou cuisse ?"
+RX_CDE_G,Radio coude gauche,RX_ABR_G,Radio avant-bras gauche,region,"Sur votre ordonnance, est-il écrit coude ou avant-bras ?"
+RX_CDE_G,Radio coude gauche,RX_BRA_G,Radio bras gauche,region,"Sur votre ordonnance, est-il écrit coude ou bras ?"
+RX_BAS,Radio bassin,RX_RLO,Radio rachis lombaire,region,"Sur votre ordonnance, est-il écrit bassin ou rachis lombaire ?"
+RX_RLO,Radio rachis lombaire,RX_RDO,Radio rachis dorsal,region,"Sur votre ordonnance, est-il écrit rachis lombaire ou rachis dorsal ?"
+RX_RDO,Radio rachis dorsal,RX_RCE,Radio rachis cervical,region,"Sur votre ordonnance, est-il écrit rachis dorsal ou rachis cervical ?"
+RX_RCE,Radio rachis cervical,RX_COU,Radio cou,region,"Sur votre ordonnance, est-il écrit rachis cervical ou cou ?"
+RX_CRA,Radio crâne,RX_FAC,Radio face,region,"Sur votre ordonnance, est-il écrit crâne ou face ?"
+TDM_HAN_D,Scanner hanche droite,TDM_CUI_D,Scanner cuisse droite,region,"Sur votre ordonnance, est-il écrit hanche ou cuisse ?"
+TDM_CUI_D,Scanner cuisse droite,TDM_GEN_D,Scanner genou droit,region,"Sur votre ordonnance, est-il écrit cuisse ou genou ?"
+TDM_GEN_D,Scanner genou droit,TDM_JAM_D,Scanner jambe droite,region,"Sur votre ordonnance, est-il écrit genou ou jambe ?"
+TDM_JAM_D,Scanner jambe droite,TDM_CHE_D,Scanner cheville droite,region,"Sur votre ordonnance, est-il écrit jambe ou cheville ?"
+TDM_CHE_D,Scanner cheville droite,TDM_PIE_D,Scanner pied droit,region,"Sur votre ordonnance, est-il écrit cheville ou pied ?"
+TDM_EPA_D,Scanner épaule droite,TDM_BRA_D,Scanner bras droit,region,"Sur votre ordonnance, est-il écrit épaule ou bras ?"
+TDM_BRA_D,Scanner bras droit,TDM_CDE_D,Scanner coude droit,region,"Sur votre ordonnance, est-il écrit bras ou coude ?"
+TDM_CDE_D,Scanner coude droit,TDM_ABR_D,Scanner avant-bras droit,region,"Sur votre ordonnance, est-il écrit coude ou avant-bras ?"
+TDM_ABR_D,Scanner avant-bras droit,TDM_POI_D,Scanner poignet droit,region,"Sur votre ordonnance, est-il écrit avant-bras ou poignet ?"
+TDM_POI_D,Scanner poignet droit,TDM_MAI_D,Scanner main droite,region,"Sur votre ordonnance, est-il écrit poignet ou main ?"
+TDM_HAN_G,Scanner hanche gauche,TDM_CUI_G,Scanner cuisse gauche,region,"Sur votre ordonnance, est-il écrit hanche ou cuisse ?"
+TDM_CUI_G,Scanner cuisse gauche,TDM_GEN_G,Scanner genou gauche,region,"Sur votre ordonnance, est-il écrit cuisse ou genou ?"
+TDM_GEN_G,Scanner genou gauche,TDM_JAM_G,Scanner jambe gauche,region,"Sur votre ordonnance, est-il écrit genou ou jambe ?"
+TDM_JAM_G,Scanner jambe gauche,TDM_CHE_G,Scanner cheville gauche,region,"Sur votre ordonnance, est-il écrit jambe ou cheville ?"
+TDM_CHE_G,Scanner cheville gauche,TDM_PIE_G,Scanner pied gauche,region,"Sur votre ordonnance, est-il écrit cheville ou pied ?"
+TDM_EPA_G,Scanner épaule gauche,TDM_BRA_G,Scanner bras gauche,region,"Sur votre ordonnance, est-il écrit épaule ou bras ?"
+TDM_BRA_G,Scanner bras gauche,TDM_CDE_G,Scanner coude gauche,region,"Sur votre ordonnance, est-il écrit bras ou coude ?"
+TDM_CDE_G,Scanner coude gauche,TDM_ABR_G,Scanner avant-bras gauche,region,"Sur votre ordonnance, est-il écrit coude ou avant-bras ?"
+TDM_ABR_G,Scanner avant-bras gauche,TDM_POI_G,Scanner poignet gauche,region,"Sur votre ordonnance, est-il écrit avant-bras ou poignet ?"
+TDM_POI_G,Scanner poignet gauche,TDM_MAI_G,Scanner main gauche,region,"Sur votre ordonnance, est-il écrit poignet ou main ?"
+TDM_RCE,Scanner rachis cervical,TDM_RDO,Scanner rachis dorsal,region,"Sur votre ordonnance, est-il écrit rachis cervical ou rachis dorsal ?"
+TDM_RCE,Scanner rachis cervical,TDM_COU,Scanner cou,region,"Sur votre ordonnance, est-il écrit rachis cervical ou cou ?"
+TDM_RDO,Scanner rachis dorsal,TDM_RLO,Scanner rachis lombaire,region,"Sur votre ordonnance, est-il écrit rachis dorsal ou rachis lombaire ?"
+TDM_CRA,Scanner crâne,TDM_FAC,Scanner face,region,"Sur votre ordonnance, est-il écrit crâne ou face ?"
+ECH_POI_D,Échographie poignet droit,ECH_MAI_D,Échographie main droite,region,"Sur votre ordonnance, est-il écrit poignet ou main ?"
+ECH_CHE_D,Échographie cheville droite,ECH_PIE_D,Échographie pied droit,region,"Sur votre ordonnance, est-il écrit cheville ou pied ?"
+ECH_POI_G,Échographie poignet gauche,ECH_MAI_G,Échographie main gauche,region,"Sur votre ordonnance, est-il écrit poignet ou main ?"
+ECH_CHE_G,Échographie cheville gauche,ECH_PIE_G,Échographie pied gauche,region,"Sur votre ordonnance, est-il écrit cheville ou pied ?"
+ECH_ABP,Échographie abdomen-pelvis,ECH_PEL,Échographie pelvis,region,"Sur votre ordonnance, est-il écrit abdomen-pelvis ou pelvis ?"
+ECH_ABP,Échographie abdomen-pelvis,ECH_ABD,Échographie abdomen,region,"Sur votre ordonnance, est-il écrit abdomen-pelvis ou abdomen ?"
+ECH_ABD,Échographie abdomen,ECH_FOI,Échographie foie,region,"Sur votre ordonnance, est-il écrit abdomen ou foie ?"
