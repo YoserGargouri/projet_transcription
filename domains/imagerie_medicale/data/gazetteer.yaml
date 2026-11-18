@@ -1,0 +1,65 @@
+# Gazetteer du pack imagerie_medicale : attribut -> valeur du catalogue -> formes orales.
+#
+# Écrit À LA MAIN (pas généré depuis build_phrases.py) : comment un patient nomme l'examen
+# au téléphone. La valeur elle-même (« genou », « IRM »...) est toujours reconnue, inutile de
+# la répéter ici. Le résolveur normalise tout (minuscules, sans accents) et cherche les formes
+# longues d'abord : « veines des jambes » l'emporte sur « jambes ».
+#
+# Attention à l'évaluation : l'auteur de ce fichier a vu les phrases générées. Le score sur
+# ces phrases est donc optimiste ; les chiffres qui comptent sont ceux du jeu « aveugle »
+# (data/phrases_aveugles/) et des vraies transcriptions Whisper.
+
+modalite:
+  IRM: [irm, i r m, résonance magnétique, imagerie par résonance]
+  Scanner: [scanner, scanners, scan, scanographie, tdm, tomodensitométrie, scanne]
+  Radio: [radio, radios, radiographie, radiographies, rayons x]
+  Échographie: [écho, échos, échographie, échographies, doppler, écho doppler, écho-doppler]
+  Mammographie: [mammographie, mammo, mammos]
+  Densitométrie: [densitométrie, ostéodensitométrie, densito, densitométrie osseuse]
+
+region:
+  vaisseaux du cou: [carotides, carotide, artères du cou, veines du cou, troncs supra-aortiques]
+  vaisseaux des jambes: [veines des jambes, artères des jambes, veines de la jambe, membres inférieurs, varices]
+  vaisseaux des bras: [veines des bras, artères des bras, veines du bras, membres supérieurs]
+  vaisseaux: [veines, artères]
+  abdomen-pelvis: [abdomino-pelvienne, abdomino-pelvien, abdominopelvienne, abdomen et pelvis, ventre et bassin]
+  rachis cervical: [cervicales, colonne cervicale, nuque]
+  rachis dorsal: [dos, dorsales, colonne dorsale, rachis thoracique]
+  rachis lombaire: [lombaires, colonne lombaire, bas du dos, lombes]
+  glandes salivaires: [glande salivaire, parotides, parotide]
+  avant-bras: [avant bras]
+  genou: [genoux]
+  cheville: [chevilles]
+  pied: [pieds, orteil, orteils]
+  hanche: [hanches]
+  cuisse: [cuisses, fémur]
+  jambe: [jambes, tibia, mollet]
+  épaule: [épaules]
+  bras: [humérus]
+  coude: [coudes]
+  poignet: [poignets]
+  main: [mains, doigt, doigts]
+  sein: [seins, mammaire]
+  thorax: [thoracique, poumons, poumon, pulmonaire, poitrine]
+  abdomen: [abdominale, abdominal, ventre]
+  pelvis: [pelvienne, pelvien, petit bassin, utérus, ovaires]
+  crâne: [cerveau, tête, encéphale, cérébrale, cérébral]
+  face: [visage, mâchoire, mandibule]
+  cou: [gorge]
+  thyroïde: [thyroïdienne]
+  reins: [rein, rénale, rénal, voies urinaires]
+  bourses: [testicules, testicule, scrotum]
+  foie: [hépatique, voies biliaires, vésicule]
+  orbites: [orbite, yeux, œil, oeil]
+  oreilles: [oreille, rochers]
+  squelette: [corps entier]
+
+lateralite:
+  G: [gauche, côté gauche]
+  D: [droit, droite, côté droit]
+  bilatéral: [des deux côtés, deux côtés, bilatéral, bilatérale, les deux genoux, les deux pieds,
+              les deux hanches, les deux poignets, les deux seins]
+
+injection:
+  oui: [avec injection, injection, produit de contraste, contraste, injecté, injectée, gadolinium]
+  non: [sans injection, sans produit de contraste, sans contraste]

@@ -1,0 +1,330 @@
+# Pack de domaine : prise de rendez-vous dans un centre d'imagerie médicale (Projet 3).
+# Contrat : src/agentkit/domain/schema.py — documentation champ par champ : docs/architecture.md.
+# Les motifs (patterns) sont des regex appliquées au texte NORMALISÉ :
+# minuscules, sans accents ni ponctuation, apostrophes et tirets remplacés par des espaces.
+schema_version: 1
+id: imagerie_medicale
+name: Centre d'imagerie des Lilas (fictif)
+description: >
+  Accueil téléphonique d'un centre d'imagerie médicale : identification de l'examen parmi
+  ~180 examens, prise / modification / annulation de rendez-vous, informations pratiques.
+language: fr
+
+persona:
+  name: l'assistant du centre d'imagerie des Lilas
+  greeting: Centre d'imagerie des Lilas, bonjour. Je peux vous aider à prendre, déplacer ou annuler un rendez-vous, ou répondre à une question pratique. Que puis-je faire pour vous ?
+  style: >
+    Phrases courtes et simples (elles seront lues à voix haute). Vouvoiement, ton calme et
+    poli. Une seule question à la fois. Jamais de jargon.
+  handoff_message: Je vous mets en relation avec une personne du secrétariat, merci de patienter.
+  fallback_message: Excusez-moi, je n'ai pas bien compris. Pouvez-vous reformuler votre demande ?
+  goodbye_message: Merci de votre appel, au revoir.
+
+scope:
+  description: prendre, déplacer, annuler ou consulter un rendez-vous d'imagerie, et donner des informations pratiques non médicales.
+  allowed:
+    - prise, modification, annulation et consultation de rendez-vous
+    - informations pratiques (horaires, accès, documents, paiement, préparation logistique)
+  # Principe directeur : le système n'évalue JAMAIS un contenu médical -> transfert humain.
+  forbidden:
+    - id: avis_medical
+      description: question demandant un avis médical (gravité, urgence, choix d'examen, risques, résultats)
+      patterns:
+        - \bgrave\b
+        - \bconseill
+        - \bdangereu
+        - \brisque
+        - \benceinte\b
+        - \bgrossesse\b
+        - \bpacemaker\b
+        - \bstimulateur\b
+        - \ballergi
+        - \bdiabet
+        - \banticoagul
+        - \bprothese\b
+        - \bimplant
+        - \bclaustrophob
+        - \bcalmant
+        - \bresultats? (sont |est )?(normaux|normal|bons?|mauvais)\b
+        - \bveut dire\b
+        - \bvu quelque chose\b
+        - \bvraiment besoin\b
+        - \bquel examen\b
+        - \bcasse\b
+        - \bsaign
+        - \brespirer\b
+        - \bvertige
+        - \burgen
+        - \brendre malade\b
+        - \bc est mieux\b
+        - \blequel\b
+        - \bd apres vous\b
+        - \bvous pensez\b
+        - \bchoisir pour moi\b
+        - \bhernie\b
+        - \bbosse\b
+        - \bfievre\b
+        - \bmedicament
+        - \btraitement\b
+        - \bpoitrine\b.*\bdouleur|\bdouleur\b.*\bpoitrine\b
+        - \brayons? je recois\b
+      # Symptômes cités au passage : médicaux seulement s'il ne s'agit pas d'une prise de rendez-vous
+      weak_patterns:
+        - \bj ai (tres |un peu )?mal\b
+        - \bdouleurs?\b
+        - \b(il|elle) a (tres )?mal\b
+        - \btombee?\b
+      except_if_intents: [nouveau_rdv]
+  human_request_patterns:
+    - \bparler a (un|une|quelqu)
+    - \bun humain\b
+    - \bune vraie personne\b
+    - \bune secretaire\b
+    - \bun conseiller\b
+    - \bpas (a )?un robot\b
+
+# Branches de la spec : nouveau_rdv · rdv_existant (3 intentions, group: rdv_existant) ·
+# info_generale · autre (humain). Les intentions de priorité haute sont testées d'abord.
+intents:
+  - id: autre
+    description: hors sujet ou hors périmètre du centre
+    handler: escalate
+    default: true
+    priority: 40
+    patterns:
+      - \bdentiste\b
+      - \bpharmacie\b
+      - \bprises? de sang\b
+      - \breclamation\b
+      - \bfacture\b
+      - \bpostuler\b
+      - \bcommercial\b
+      - \blivr(eur|aison)\b
+      - \brembours
+      - \btrompe de numero\b
+      - \bmessage que vous\b
+      - \boubli
+      - \bjoindre (le|la) (docteur|dr)\b
+  - id: annuler_rdv
+    group: rdv_existant
+    description: annuler un rendez-vous existant
+    handler: workflow:cancel
+    priority: 30
+    patterns: [\bannul, \bsupprim, \bpourrai pas venir\b, \bpeux pas venir\b]
+    examples: ["Je dois annuler mon rendez-vous de demain."]
+  - id: deplacer_rdv
+    group: rdv_existant
+    description: déplacer un rendez-vous existant
+    handler: workflow:reschedule
+    priority: 30
+    patterns: [\bdeplac, \bdecal, \breport, \bchanger (mon|la date|l heure)\b]
+    examples: ["Je voudrais déplacer mon rendez-vous de jeudi."]
+  - id: consulter_rdv
+    group: rdv_existant
+    description: confirmer ou retrouver l'heure d'un rendez-vous existant
+    handler: workflow:consult
+    priority: 25
+    patterns:
+      - \bmon (rendez vous|rdv|examen)\b
+      - \bmaintenu\b
+      - \bconfirmer\b
+      - \bheure (de|est) mon\b
+      - \bj ai (un )?rendez vous\b
+    examples: ["À quelle heure est mon rendez-vous lundi ?"]
+  - id: info_generale
+    description: information pratique non médicale (FAQ, préparation, durée)
+    handler: knowledge
+    priority: 20
+    patterns:
+      - \bhoraires?\b
+      - \bouverts?\b
+      - \bfermes?\b
+      - \badresse\b
+      - \bc est ou\b
+      - \bparking\b
+      - \bbus\b
+      - \bmetro\b
+      - \bfauteuil\b
+      - \baccessible\b
+      - \baccompagne
+      - \bcarte vitale\b
+      - \btiers payant\b
+      - \bsecteur [12]\b
+      - \bconventionn
+      - \bcombien (ca|cela) coute\b
+      - \bprix\b
+      - \bpayer\b
+      - \bcarte bancaire\b
+      - \bresultats?\b
+      - \bimages?\b
+      - \bjustificatif\b
+      - \bsalle d attente\b
+      - \bapporter\b
+      - \ba jeun\b
+      - \bcombien de temps\b
+      - \bdure\b
+    examples: ["Vous êtes ouverts le samedi ?", "Il faut être à jeun pour un scanner ?"]
+  - id: nouveau_rdv
+    description: prendre un nouveau rendez-vous pour un examen
+    handler: workflow:booking
+    priority: 10
+    patterns:
+      - \b(prendre|avoir|fixer|reserver|obtenir) (un )?(rendez vous|rdv|creneau)\b
+      - \bcreneau\b
+      - \bordonnance\b
+      - \bprescrit\b
+      - \bje dois (faire|passer)\b
+      - \b(il|elle) doit passer\b
+      - \bil me faudrait\b
+      - \bde la place\b
+      - \bc est pour (un|une)\b
+      - \b(irm|scanner|scan|radio|radiographie|echo|echographie|mammo|mammographie|densitometrie|doppler)\b
+    examples: ["Je voudrais un rendez-vous pour une IRM du genou gauche."]
+
+catalogue:
+  file: data/catalogue.csv
+  id_column: code
+  label_column: libelle
+  # Ordre des filtres : A = modalité, puis région, côté, injection
+  attributes:
+    - name: modalite
+      column: modalite
+      on_missing: ask
+      question: Votre ordonnance indique-t-elle {options} ?
+      option_labels: {IRM: une IRM, Scanner: un scanner, Radio: une radio, Échographie: une échographie,
+                      Mammographie: une mammographie, Densitométrie: une densitométrie}
+    - name: region
+      column: region
+      on_missing: ask
+      question: Sur votre ordonnance, est-il écrit {options} ?
+    - name: lateralite
+      column: lateralite
+      on_missing: ask
+      not_applicable: [aucune]
+      question: Votre ordonnance précise-t-elle le côté, {options} ?
+      option_labels: {G: gauche, D: droit, bilatéral: les deux côtés}
+    - name: injection
+      column: injection
+      on_missing: default
+      default: non
+      question: Votre ordonnance mentionne-t-elle une injection de produit de contraste ?
+      option_labels: {oui: avec injection, non: sans injection}
+  gazetteer: data/gazetteer.yaml
+  synonym_columns: [mots_cles, synonymes]
+  fuzzy:
+    min_score: 82
+    min_length: 5
+    # Vrais mots proches d'une forme du gazetteer : jamais « corrigés »
+    exclude_words: [endroit, adroit, droits, gaucher, inspection, infection, contrat, contraire, doit]
+  confusions:
+    file: data/confusions.csv
+    column_a: exam_a
+    column_b: exam_b
+    column_type: type_confusion
+    column_question: question_desambiguisation
+  confidence: {accept: 0.75, confirm: 0.5, confusable_penalty: 0.7}
+  shortlist_size: 15
+
+knowledge:
+  file: data/faq/faq.csv
+  id_column: id
+  question_column: question
+  answer_column: reponse
+  variants_column: variantes
+  retriever: tfidf
+  min_score: 0.35
+
+workflows:
+  - workflows/booking.yaml
+  - workflows/reschedule.yaml
+  - workflows/cancel.yaml
+  - workflows/consult.yaml
+
+tools:
+  - name: agenda
+    builtin: calendar
+    description: agenda simulé du centre (une ressource par modalité)
+    config:
+      resource_attribute: modalite       # la ressource réservée = la machine de la modalité
+      duration_field: duree_min          # durée du créneau = colonne duree_min du catalogue
+      default_duration_min: 20
+      slot_step_min: 10
+      horizon_days: 30
+      reference_prefix: RDV
+      opening_hours:
+        mon: ["08:00-19:00"]
+        tue: ["08:00-19:00"]
+        wed: ["08:00-19:00"]
+        thu: ["08:00-19:00"]
+        fri: ["08:00-19:00"]
+        sat: ["08:00-12:30"]
+
+signals:
+  # Frustration envers le système (pas l'inquiétude) : lexique maintenant, modèle entraîné en phase 4
+  - id: frustration
+    kind: lexicon
+    description: frustration dirigée contre le système (répétitions, attente, robot)
+    threshold: 0.5
+    patterns:
+      - \brepet
+      - \bdeja (dit|donne|repondu)\b
+      - \bcomprenez (rien|pas)\b
+      - \brobot\b
+      - \bmachine\b
+      - \bnul(le)?\b
+      - \bmarre\b
+      - \b(minutes|heure) que j attends\b
+      - \braccroch
+      - \binsupportable\b
+      - \binadmissible\b
+      - \bpenible\b
+      - \benerv
+      - \bagac
+      - \bn importe quoi\b
+      - \bmoquez\b
+      - \bperds? (mon|du) temps\b
+      - \bcombien de fois\b
+      - \b(troisieme|quatrieme|trois|quatre) fois\b
+      - \bras le bol\b
+
+escalation:
+  max_failed_clarifications: 2
+  max_audio_failures: 2
+  max_unrecognised_turns: 2
+  signal_thresholds: {frustration: 0.9}
+
+# Questions de sécurité pré-examen : script fixe, toute réponse positive -> humain
+safety_scripts:
+  - id: metal_irm
+    applies_if: {modalite: [IRM]}
+    question: Une question de sécurité avant l'IRM. Portez-vous un stimulateur cardiaque, un implant ou un objet métallique dans le corps ?
+  - id: grossesse_rayons
+    applies_if: {modalite: [Radio, Scanner, Mammographie, Densitométrie]}
+    question: Une question de sécurité. Êtes-vous enceinte, ou est-il possible que vous le soyez ?
+  - id: allergie_contraste
+    applies_if: {injection: [oui]}
+    question: Avez-vous déjà eu une réaction allergique à un produit de contraste ?
+
+answers:
+  positive: ['^(oui|ouais|bien sur|tout a fait|exactement|absolument|affirmatif|c est ca|d accord|ok)\b', '\boui\b']
+  negative: ['^(non|nan|pas du tout|aucun|aucune|jamais)\b', '\bnon\b', '\bje n ai (pas|aucun)', '\bje ne suis pas\b', '\bpas de\b']
+
+channels:
+  audio:
+    stt: {engine: whisper-small}
+    tts:
+      engine: elevenlabs
+      voice_id: ${ELEVENLABS_VOICE_ID}
+      model_id: ${ELEVENLABS_MODEL_ID:-eleven_flash_v2_5}
+      fallback: [gtts, piper]
+      settings: {stability: 0.5, similarity_boost: 0.75}
+    quality: {min_duration_s: 0.4, min_level_db: -45, snr_bad_db: 5, snr_medium_db: 12, conf_bad: 0.45, conf_medium: 0.7}
+    retry_message: Je ne vous ai pas bien entendu. Pouvez-vous répéter, s'il vous plaît ?
+
+llm:
+  system_prompt: prompts/agent_system.md
+  max_history_turns: 6
+
+logging:
+  # Numéro de sécurité sociale (masqué en plus des motifs génériques)
+  extra_patterns: ['\b[12]\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{3}\s?\d{3}\s?\d{2}\b']

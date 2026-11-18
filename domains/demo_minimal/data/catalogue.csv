@@ -1,0 +1,11 @@
+code,libelle,type,taille,duree_min,prix_jour
+V_VILLE_S,Vélo de ville taille S,ville,S,240,15
+V_VILLE_M,Vélo de ville taille M,ville,M,240,15
+V_VILLE_L,Vélo de ville taille L,ville,L,240,15
+V_VTT_S,VTT taille S,vtt,S,240,20
+V_VTT_M,VTT taille M,vtt,M,240,20
+V_VTT_L,VTT taille L,vtt,L,240,20
+V_ELEC_M,Vélo électrique taille M,electrique,M,240,35
+V_ELEC_L,Vélo électrique taille L,electrique,L,240,35
+V_ENFANT_S,Vélo enfant taille S,enfant,S,240,10
+V_CARGO_L,Vélo cargo taille L,cargo,L,240,40

@@ -1,0 +1,10 @@
+type:
+  ville: [vélo de ville, vélo urbain]
+  vtt: [vélo tout terrain, vélo de montagne]
+  electrique: [électrique, vélo électrique, vae]
+  enfant: [vélo enfant, pour enfant]
+  cargo: [vélo cargo, triporteur]
+taille:
+  S: [petite taille, petit, petite]
+  M: [taille moyenne, moyen, moyenne]
+  L: [grande taille, grand, grande]

@@ -1,0 +1,14 @@
+# Annuler un rendez-vous existant (branche rdv_existant). Phase 1 : slots et action finale.
+id: cancel
+description: annuler un rendez-vous existant
+slots:
+  - name: reference
+    type: reference
+    prompt: Pouvez-vous me donner la référence du rendez-vous à annuler ?
+confirmation: "J'annule le rendez-vous {slots.reference}. Vous confirmez ?"
+on_complete:
+  tool: agenda
+  action: cancel
+  arguments:
+    reference: "{slots.reference}"
+success_message: "Votre rendez-vous {slots.reference} est annulé."
