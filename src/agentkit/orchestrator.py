@@ -103,6 +103,7 @@ class Orchestrator:
     def handle_text(self, text: str) -> TurnResult:
         s = self.state
         s.turn += 1
+        s.audio_failures = 0                                    # entrée comprise : compteur remis à zéro
         if self.gateway:
             self.gateway.begin_turn(f"{s.session_id}:{s.turn}", self.policy.max_llm_calls_per_turn)
         s.history.append({"role": "user", "text": text})
@@ -137,6 +138,18 @@ class Orchestrator:
         if handler == "knowledge":
             return self._knowledge(text, trace)
         return self._workflow_turn(intent, handler.split(":", 1)[1], text, scores, trace)
+
+    def handle_unusable_input(self, retry_message: str) -> TurnResult:
+        """Entrée inexploitable (audio vide, inaudible...) : on redemande, puis transfert
+        après escalation.max_audio_failures échecs consécutifs."""
+        s = self.state
+        s.turn += 1
+        s.audio_failures += 1
+        s.history.append({"role": "user", "text": "[entrée inexploitable]"})
+        trace = {"turn": s.turn, "unusable_input": s.audio_failures}
+        if e := self.escalation_policy.from_counters(0, 0, s.audio_failures):
+            return self._escalate(e, trace)
+        return self._result(retry_message, trace)
 
     # ================================================================== branches ==============
     def _knowledge(self, text: str, trace: dict) -> TurnResult:
