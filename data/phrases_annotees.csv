@@ -1,0 +1,271 @@
+id,texte,branche,examen_code,info_manquante,candidats,frustration,hors_perimetre,source,split
+P001,"Bon, vous ne comprenez rien, bonsoir, je souhaiterais réserver une IRM de la jambe.",nouveau_rdv,,cote,IRM_JAM_G|IRM_JAM_D,1,0,gabarit,test
+P002,"Ça fait trois fois que je répète, on m'a dit d'appeler ici pour une IRM du genou côté gauche.",nouveau_rdv,IRM_GEN_G,,,1,0,gabarit,test
+P003,"Mon médecin m'a prescrit une IRM de l'épaule gauche, je voudrais un créneau.",nouveau_rdv,IRM_EPA_G,,,0,0,gabarit,train
+P004,On m'a dit d'appeler ici pour un scan des veines des jambes.,nouveau_rdv,TDM_VMI,,,0,0,gabarit,test
+P005,"Salut, euh, je cherche un créneau pour une échographie du sein côté droit.",nouveau_rdv,ECH_SEI_D,,,0,0,gabarit,test
+P006,"C'est la troisième fois que j'appelle, oui allô, c'est pour un scan des lombaires s'il vous plaît.",nouveau_rdv,TDM_RLO,,,1,0,gabarit,train
+P007,"Bonjour, j'ai une ordonnance pour un scan du genou droit, c'est possible cette semaine ?",nouveau_rdv,TDM_GEN_D,,,0,0,gabarit,train
+P008,"J'appelle pour une IRM de la cheville droite, j'ai l'ordonnance du docteur.",nouveau_rdv,IRM_CHE_D,,,0,0,gabarit,train
+P009,"Bonsoir, je souhaiterais réserver une IRM du cou avec injection.",nouveau_rdv,IRM_COU_INJ,,,0,0,gabarit,test
+P010,"Bonjour, je voudrais prendre rendez-vous pour une IRM de la main gauche avec injection.",nouveau_rdv,IRM_MAI_G_INJ,,,0,0,gabarit,train
+P011,Est-ce que je peux avoir un rendez-vous pour une radiographie du poignet gauche la semaine prochaine ?,nouveau_rdv,RX_POI_G,,,0,0,gabarit,train
+P012,"Mon médecin m'a prescrit un examen des carotides, je voudrais un créneau.",nouveau_rdv,,modalite,ECH_VCO|TDM_VCO|IRM_VCO,0,0,gabarit,train
+P013,"C'est la troisième fois que j'appelle, bonsoir, je souhaiterais réserver une échographie de la cheville gauche.",nouveau_rdv,ECH_CHE_G,,,1,0,gabarit,test
+P014,"Ça fait trois fois que je répète, je dois faire une IRM du coude côté gauche avec injection, vous avez de la place quand ?",nouveau_rdv,IRM_CDE_G_INJ,,,1,0,gabarit,train
+P015,"Franchement c'est pénible, salut, euh, je cherche un créneau pour un scanner abdomino-pelvienne.",nouveau_rdv,TDM_ABP,,,1,0,gabarit,test
+P016,On m'a dit d'appeler ici pour un examen abdomino-pelvienne.,nouveau_rdv,,modalite,ECH_ABP|TDM_ABP|IRM_ABP,0,0,gabarit,test
+P017,"Franchement c'est pénible, bonsoir, je souhaiterais réserver un scanner de la main.",nouveau_rdv,,cote,TDM_MAI_G|TDM_MAI_D,1,0,gabarit,test
+P018,"J'appelle pour une IRM du poignet côté gauche, j'ai l'ordonnance du docteur.",nouveau_rdv,IRM_POI_G,,,0,0,gabarit,train
+P019,"Bon, vous ne comprenez rien, oui allô, c'est pour une IRM du rachis cervical avec injection s'il vous plaît.",nouveau_rdv,IRM_RCE_INJ,,,1,0,gabarit,train
+P020,"Salut, euh, je cherche un créneau pour une échographie du foie.",nouveau_rdv,ECH_FOI,,,0,0,gabarit,test
+P021,"Allô ? Oui, il me faudrait une radio de l'abdomen, vous faites ça chez vous ?",nouveau_rdv,RX_ABD,,,0,0,gabarit,test
+P022,"Bonjour, j'ai une ordonnance pour une écho du foie, c'est possible cette semaine ?",nouveau_rdv,ECH_FOI,,,0,0,gabarit,train
+P023,"Euh bonjour, c'est pour prendre un rendez-vous, euh, un examen de la jambe gauche.",nouveau_rdv,,modalite,IRM_JAM_G|TDM_JAM_G|RX_JAM_G,0,0,gabarit,train
+P024,On m'a dit d'appeler ici pour une IRM du poignet gauche.,nouveau_rdv,IRM_POI_G,,,0,0,gabarit,test
+P025,"Je dois faire une IRM du coude gauche avec produit de contraste, vous avez de la place quand ?",nouveau_rdv,IRM_CDE_G_INJ,,,0,0,gabarit,train
+P026,"Ça fait vingt minutes que j'attends, j'appelle pour un scan du cou avec produit de contraste, j'ai l'ordonnance du docteur.",nouveau_rdv,TDM_COU_INJ,,,1,0,gabarit,train
+P027,"Franchement c'est pénible, salut, euh, je cherche un créneau pour un examen du dos.",nouveau_rdv,,modalite,IRM_RDO|TDM_RDO|RX_RDO,1,0,gabarit,test
+P028,"C'est la troisième fois que j'appelle, bonjour, j'ai une ordonnance pour une échographie du pied droit, c'est possible cette semaine ?",nouveau_rdv,ECH_PIE_D,,,1,0,gabarit,train
+P029,"J'appelle pour un examen des carotides, j'ai l'ordonnance du docteur.",nouveau_rdv,,modalite,ECH_VCO|TDM_VCO|IRM_VCO,0,0,gabarit,train
+P030,Est-ce que je peux avoir un rendez-vous pour un scanner du dos la semaine prochaine ?,nouveau_rdv,TDM_RDO,,,0,0,gabarit,train
+P031,Est-ce que je peux avoir un rendez-vous pour un scan des carotides la semaine prochaine ?,nouveau_rdv,TDM_VCO,,,0,0,gabarit,train
+P032,"C'est pour ma mère, elle doit passer un examen de la cheville gauche.",nouveau_rdv,,modalite,ECH_CHE_G|IRM_CHE_G|RX_CHE_G|TDM_CHE_G,0,0,gabarit,train
+P033,"Allô ? Oui, il me faudrait une IRM de la hanche droite avec injection, vous faites ça chez vous ?",nouveau_rdv,IRM_HAN_D_INJ,,,0,0,gabarit,test
+P034,"Bon, vous ne comprenez rien, bonjour, je voudrais prendre rendez-vous pour une IRM du crâne avec produit de contraste.",nouveau_rdv,IRM_CRA_INJ,,,1,0,gabarit,train
+P035,"Je dois faire un scanner des carotides, vous avez de la place quand ?",nouveau_rdv,TDM_VCO,,,0,0,gabarit,train
+P036,"Encore ce robot... Allô ? Oui, il me faudrait une IRM de la jambe côté droit avec injection, vous faites ça chez vous ?",nouveau_rdv,IRM_JAM_D_INJ,,,1,0,gabarit,test
+P037,Est-ce que je peux avoir un rendez-vous pour un scan du genou gauche la semaine prochaine ?,nouveau_rdv,TDM_GEN_G,,,0,0,gabarit,train
+P038,"Bonsoir, je souhaiterais réserver une IRM de la cuisse.",nouveau_rdv,,cote,IRM_CUI_G|IRM_CUI_D,0,0,gabarit,test
+P039,"Bon, vous ne comprenez rien, bonjour, j'ai une ordonnance pour une IRM du coude, c'est possible cette semaine ?",nouveau_rdv,,cote,IRM_CDE_G|IRM_CDE_D,1,0,gabarit,train
+P040,"Je dois faire une radio de la hanche des deux côtés, vous avez de la place quand ?",nouveau_rdv,RX_HAN_BIL,,,0,0,gabarit,train
+P041,"J'appelle pour une IRM de la cuisse, j'ai l'ordonnance du docteur.",nouveau_rdv,,cote,IRM_CUI_G|IRM_CUI_D,0,0,gabarit,train
+P042,"Salut, euh, je cherche un créneau pour une IRM de l'épaule.",nouveau_rdv,,cote,IRM_EPA_G|IRM_EPA_D,0,0,gabarit,test
+P043,Est-ce que je peux avoir un rendez-vous pour une échographie de la hanche la semaine prochaine ?,nouveau_rdv,,cote,ECH_HAN_G|ECH_HAN_D,0,0,gabarit,train
+P044,"Ça fait vingt minutes que j'attends, je dois faire un examen de la main côté gauche, vous avez de la place quand ?",nouveau_rdv,,modalite,ECH_MAI_G|RX_MAI_G|IRM_MAI_G|TDM_MAI_G,1,0,gabarit,train
+P045,"Franchement c'est pénible, mon médecin m'a prescrit une échographie de la hanche côté gauche, je voudrais un créneau.",nouveau_rdv,ECH_HAN_G,,,1,0,gabarit,train
+P046,"Franchement c'est pénible, c'est pour ma mère, elle doit passer une radio du genou des deux côtés.",nouveau_rdv,RX_GEN_BIL,,,1,0,gabarit,train
+P047,"Bonjour, j'ai une ordonnance pour une radio de l'épaule, c'est possible cette semaine ?",nouveau_rdv,,cote,RX_EPA_G|RX_EPA_D,0,0,gabarit,train
+P048,"Mon médecin m'a prescrit une échographie des testicules, je voudrais un créneau.",nouveau_rdv,ECH_BOU,,,0,0,gabarit,train
+P049,"Encore ce robot... Bonjour, je voudrais prendre rendez-vous pour une IRM du cou avec produit de contraste.",nouveau_rdv,IRM_COU_INJ,,,1,0,gabarit,train
+P050,"Euh bonjour, c'est pour prendre un rendez-vous, euh, un examen du bras gauche.",nouveau_rdv,,modalite,IRM_BRA_G|TDM_BRA_G|RX_BRA_G,0,0,gabarit,train
+P051,"Je dois faire un scanner de la main droite, vous avez de la place quand ?",nouveau_rdv,TDM_MAI_D,,,0,0,gabarit,train
+P052,"Allô ? Oui, il me faudrait une IRM de la cuisse, vous faites ça chez vous ?",nouveau_rdv,,cote,IRM_CUI_G|IRM_CUI_D,0,0,gabarit,test
+P053,"Je suis un peu stressé, oui allô, c'est pour un scanner de la cuisse côté droit s'il vous plaît.",nouveau_rdv,TDM_CUI_D,,,0,0,gabarit,train
+P054,"J'appelle pour une échographie des reins, j'ai l'ordonnance du docteur.",nouveau_rdv,ECH_REI,,,0,0,gabarit,train
+P055,"J'appelle pour une radio des lombaires, j'ai l'ordonnance du docteur.",nouveau_rdv,RX_RLO,,,0,0,gabarit,train
+P056,"Oui allô, c'est pour une IRM du poignet s'il vous plaît.",nouveau_rdv,,cote,IRM_POI_G|IRM_POI_D,0,0,gabarit,train
+P057,"Oui allô, c'est pour un examen de la main gauche s'il vous plaît.",nouveau_rdv,,modalite,ECH_MAI_G|RX_MAI_G|IRM_MAI_G|TDM_MAI_G,0,0,gabarit,train
+P058,"Mon médecin m'a prescrit une IRM de la face, je voudrais un créneau.",nouveau_rdv,IRM_FAC,,,0,0,gabarit,train
+P059,"Je dois faire une écho de la main, vous avez de la place quand ?",nouveau_rdv,,cote,ECH_MAI_G|ECH_MAI_D,0,0,gabarit,train
+P060,"C'est la troisième fois que j'appelle, bonjour, je voudrais prendre rendez-vous pour une échographie du sein côté gauche.",nouveau_rdv,ECH_SEI_G,,,1,0,gabarit,train
+P061,"J'appelle pour un scanner du bras droit, j'ai l'ordonnance du docteur.",nouveau_rdv,TDM_BRA_D,,,0,0,gabarit,train
+P062,On m'a dit d'appeler ici pour une écho abdomino-pelvienne.,nouveau_rdv,ECH_ABP,,,0,0,gabarit,test
+P063,"Oui allô, c'est pour un scan du coude s'il vous plaît.",nouveau_rdv,,cote,TDM_CDE_G|TDM_CDE_D,0,0,gabarit,train
+P064,"Salut, euh, je cherche un créneau pour une échographie du poignet gauche.",nouveau_rdv,ECH_POI_G,,,0,0,gabarit,test
+P065,"Euh bonjour, c'est pour prendre un rendez-vous, euh, une IRM de la cuisse droite avec injection.",nouveau_rdv,IRM_CUI_D_INJ,,,0,0,gabarit,train
+P066,"Ça fait vingt minutes que j'attends, salut, euh, je cherche un créneau pour une échographie des veines des jambes.",nouveau_rdv,ECH_VMI,,,1,0,gabarit,test
+P067,"Encore ce robot... Salut, euh, je cherche un créneau pour une radio du coude côté droit.",nouveau_rdv,RX_CDE_D,,,1,0,gabarit,test
+P068,"C'est la troisième fois que j'appelle, bonjour, j'ai une ordonnance pour un scan du pied droit, c'est possible cette semaine ?",nouveau_rdv,TDM_PIE_D,,,1,0,gabarit,train
+P069,"Encore ce robot... Euh bonjour, c'est pour prendre un rendez-vous, euh, une radio du dos.",nouveau_rdv,RX_RDO,,,1,0,gabarit,train
+P070,"Mon médecin m'a prescrit un scanner du thorax avec produit de contraste, je voudrais un créneau.",nouveau_rdv,TDM_THO_INJ,,,0,0,gabarit,train
+P071,"Ça fait vingt minutes que j'attends, j'appelle pour un scan du thorax avec injection, j'ai l'ordonnance du docteur.",nouveau_rdv,TDM_THO_INJ,,,1,0,gabarit,train
+P072,"Oui allô, c'est pour une IRM de la cheville gauche avec injection s'il vous plaît.",nouveau_rdv,IRM_CHE_G_INJ,,,0,0,gabarit,train
+P073,"Euh bonjour, c'est pour prendre un rendez-vous, euh, un scanner abdomino-pelvienne.",nouveau_rdv,TDM_ABP,,,0,0,gabarit,train
+P074,"Je vous l'ai déjà dit ! Allô ? Oui, il me faudrait un examen du pied côté gauche, vous faites ça chez vous ?",nouveau_rdv,,modalite,ECH_PIE_G|IRM_PIE_G|RX_PIE_G|TDM_PIE_G,1,0,gabarit,test
+P075,"J'appelle pour une IRM de la face, j'ai l'ordonnance du docteur.",nouveau_rdv,IRM_FAC,,,0,0,gabarit,train
+P076,"Bonjour, j'ai une ordonnance pour une IRM de la main droite avec produit de contraste, c'est possible cette semaine ?",nouveau_rdv,IRM_MAI_D_INJ,,,0,0,gabarit,train
+P077,"Encore ce robot... Bonsoir, je souhaiterais réserver une radiographie du coude gauche.",nouveau_rdv,RX_CDE_G,,,1,0,gabarit,test
+P078,Est-ce que je peux avoir un rendez-vous pour une IRM de la face avec produit de contraste la semaine prochaine ?,nouveau_rdv,IRM_FAC_INJ,,,0,0,gabarit,train
+P079,"Bonjour, je voudrais prendre rendez-vous pour une écho des reins.",nouveau_rdv,ECH_REI,,,0,0,gabarit,train
+P080,"Allô ? Oui, il me faudrait une IRM du poignet côté gauche avec injection, vous faites ça chez vous ?",nouveau_rdv,IRM_POI_G_INJ,,,0,0,gabarit,test
+P081,"Je vous l'ai déjà dit ! Salut, euh, je cherche un créneau pour un scan abdomino-pelvienne avec produit de contraste.",nouveau_rdv,TDM_ABP_INJ,,,1,0,gabarit,test
+P082,"Ça fait trois fois que je répète, mon médecin m'a prescrit une échographie du thorax, je voudrais un créneau.",nouveau_rdv,ECH_THO,,,1,0,gabarit,train
+P083,"Mon médecin m'a prescrit une IRM du sein côté gauche avec produit de contraste, je voudrais un créneau.",nouveau_rdv,IRM_SEI_G_INJ,,,0,0,gabarit,train
+P084,"Allô ? Oui, il me faudrait une radiographie du pied côté droit, vous faites ça chez vous ?",nouveau_rdv,RX_PIE_D,,,0,0,gabarit,test
+P085,"Encore ce robot... Oui allô, c'est pour une IRM du poignet côté gauche avec injection s'il vous plaît.",nouveau_rdv,IRM_POI_G_INJ,,,1,0,gabarit,train
+P086,"J'appelle pour une radio de la hanche des deux côtés, j'ai l'ordonnance du docteur.",nouveau_rdv,RX_HAN_BIL,,,0,0,gabarit,train
+P087,"Bonjour, j'ai une ordonnance pour un scan de la main, c'est possible cette semaine ?",nouveau_rdv,,cote,TDM_MAI_G|TDM_MAI_D,0,0,gabarit,train
+P088,"J'appelle pour une écho des glandes salivaires, j'ai l'ordonnance du docteur.",nouveau_rdv,ECH_GSA,,,0,0,gabarit,train
+P089,On m'a dit d'appeler ici pour une écho des veines des bras.,nouveau_rdv,ECH_VMS,,,0,0,gabarit,test
+P090,On m'a dit d'appeler ici pour une IRM du sein côté gauche avec produit de contraste.,nouveau_rdv,IRM_SEI_G_INJ,,,0,0,gabarit,test
+P091,"Ça fait vingt minutes que j'attends, je dois faire un scan de l'avant-bras, vous avez de la place quand ?",nouveau_rdv,,cote,TDM_ABR_G|TDM_ABR_D,1,0,gabarit,train
+P092,"C'est la troisième fois que j'appelle, euh bonjour, c'est pour prendre un rendez-vous, euh, un examen de squelette.",nouveau_rdv,,modalite,DMO_SQU|RX_SQU,1,0,gabarit,train
+P093,On m'a dit d'appeler ici pour un scanner du thorax.,nouveau_rdv,TDM_THO,,,0,0,gabarit,test
+P094,"C'est la troisième fois que j'appelle, euh bonjour, c'est pour prendre un rendez-vous, euh, une radio de squelette.",nouveau_rdv,RX_SQU,,,1,0,gabarit,train
+P095,"Ça fait vingt minutes que j'attends, est-ce que je peux avoir un rendez-vous pour une IRM de la cheville côté droit avec produit de contraste la semaine prochaine ?",nouveau_rdv,IRM_CHE_D_INJ,,,1,0,gabarit,train
+P096,"Je dois faire une mammo du sein droit, vous avez de la place quand ?",nouveau_rdv,MAM_SEI_D,,,0,0,gabarit,train
+P097,"Je dois faire un scan du coude côté droit, vous avez de la place quand ?",nouveau_rdv,TDM_CDE_D,,,0,0,gabarit,train
+P098,"Salut, euh, je cherche un créneau pour une écho des testicules.",nouveau_rdv,ECH_BOU,,,0,0,gabarit,test
+P099,"Allô ? Oui, il me faudrait une radiographie de la cuisse, vous faites ça chez vous ?",nouveau_rdv,,cote,RX_CUI_G|RX_CUI_D,0,0,gabarit,test
+P100,"C'est la troisième fois que j'appelle, bonsoir, je souhaiterais réserver une écho de l'épaule.",nouveau_rdv,,cote,ECH_EPA_G|ECH_EPA_D,1,0,gabarit,test
+P101,"Ça fait vingt minutes que j'attends, oui allô, c'est pour un examen de la main côté gauche s'il vous plaît.",nouveau_rdv,,modalite,ECH_MAI_G|RX_MAI_G|IRM_MAI_G|TDM_MAI_G,1,0,gabarit,train
+P102,"J'ai un peu peur de l'examen, mais Euh bonjour, c'est pour prendre un rendez-vous, euh, un examen du pied côté droit.",nouveau_rdv,,modalite,ECH_PIE_D|IRM_PIE_D|RX_PIE_D|TDM_PIE_D,0,0,gabarit,train
+P103,"Ça fait trois fois que je répète, c'est pour ma mère, elle doit passer une radio du genou côté gauche.",nouveau_rdv,RX_GEN_G,,,1,0,gabarit,train
+P104,"Ça fait trois fois que je répète, salut, euh, je cherche un créneau pour une IRM de l'avant-bras avec injection.",nouveau_rdv,,cote,IRM_ABR_G_INJ|IRM_ABR_D_INJ,1,0,gabarit,test
+P105,"Allô ? Oui, il me faudrait un examen du thorax, vous faites ça chez vous ?",nouveau_rdv,,modalite,RX_THO|TDM_THO|ECH_THO,0,0,gabarit,test
+P106,"Franchement c'est pénible, bonjour, j'ai une ordonnance pour une IRM du genou côté gauche avec produit de contraste, c'est possible cette semaine ?",nouveau_rdv,IRM_GEN_G_INJ,,,1,0,gabarit,train
+P107,"Ça fait trois fois que je répète, on m'a dit d'appeler ici pour une IRM de la jambe côté droit.",nouveau_rdv,IRM_JAM_D,,,1,0,gabarit,test
+P108,"Encore ce robot... Je dois faire une IRM de la jambe côté droit avec injection, vous avez de la place quand ?",nouveau_rdv,IRM_JAM_D_INJ,,,1,0,gabarit,train
+P109,"Bonsoir, je souhaiterais réserver une IRM du bras.",nouveau_rdv,,cote,IRM_BRA_G|IRM_BRA_D,0,0,gabarit,test
+P110,"Allô ? Oui, il me faudrait une IRM de la cheville côté gauche, vous faites ça chez vous ?",nouveau_rdv,IRM_CHE_G,,,0,0,gabarit,test
+P111,"C'est la troisième fois que j'appelle, bonsoir, je souhaiterais réserver un scan de la cheville.",nouveau_rdv,,cote,TDM_CHE_G|TDM_CHE_D,1,0,gabarit,test
+P112,"C'est pour ma mère, elle doit passer une IRM du genou côté droit.",nouveau_rdv,IRM_GEN_D,,,0,0,gabarit,train
+P113,Est-ce que je peux avoir un rendez-vous pour une écho des veines des jambes la semaine prochaine ?,nouveau_rdv,ECH_VMI,,,0,0,gabarit,train
+P114,"J'ai un peu peur de l'examen, mais J'appelle pour une écho de l'aorte, j'ai l'ordonnance du docteur.",nouveau_rdv,ECH_AOR,,,0,0,gabarit,train
+P115,"Bonjour, j'ai une ordonnance pour une radio du poignet côté gauche, c'est possible cette semaine ?",nouveau_rdv,RX_POI_G,,,0,0,gabarit,train
+P116,"Bon, vous ne comprenez rien, bonsoir, je souhaiterais réserver un scan du pied côté droit.",nouveau_rdv,TDM_PIE_D,,,1,0,gabarit,test
+P117,"Euh bonjour, c'est pour prendre un rendez-vous, euh, une IRM de l'avant-bras droit.",nouveau_rdv,IRM_ABR_D,,,0,0,gabarit,train
+P118,"Mon médecin m'a prescrit un examen du pied côté droit, je voudrais un créneau.",nouveau_rdv,,modalite,ECH_PIE_D|IRM_PIE_D|RX_PIE_D|TDM_PIE_D,0,0,gabarit,train
+P119,"Salut, euh, je cherche un créneau pour une IRM du bras côté gauche.",nouveau_rdv,IRM_BRA_G,,,0,0,gabarit,test
+P120,"Excusez-moi de vous déranger, bonjour, j'ai une ordonnance pour un examen de la cheville droite, c'est possible cette semaine ?",nouveau_rdv,,modalite,ECH_CHE_D|IRM_CHE_D|RX_CHE_D|TDM_CHE_D,0,0,gabarit,train
+P121,"Euh bonjour, c'est pour prendre un rendez-vous, euh, une IRM du sein côté gauche avec produit de contraste.",nouveau_rdv,IRM_SEI_G_INJ,,,0,0,gabarit,train
+P122,"C'est pour ma mère, elle doit passer une IRM de la main gauche.",nouveau_rdv,IRM_MAI_G,,,0,0,gabarit,train
+P123,"C'est la troisième fois que j'appelle, euh bonjour, c'est pour prendre un rendez-vous, euh, une IRM de la cheville gauche.",nouveau_rdv,IRM_CHE_G,,,1,0,gabarit,train
+P124,"Je suis un peu stressé, je dois faire une IRM du pied gauche avec injection, vous avez de la place quand ?",nouveau_rdv,IRM_PIE_G_INJ,,,0,0,gabarit,train
+P125,"J'ai un peu peur de l'examen, mais Oui allô, c'est pour une échographie des reins s'il vous plaît.",nouveau_rdv,ECH_REI,,,0,0,gabarit,train
+P126,"Ça fait trois fois que je répète, j'appelle pour une radio de la cheville côté gauche, j'ai l'ordonnance du docteur.",nouveau_rdv,RX_CHE_G,,,1,0,gabarit,train
+P127,"Ça fait trois fois que je répète, allô ? Oui, il me faudrait une radiographie du poignet côté droit, vous faites ça chez vous ?",nouveau_rdv,RX_POI_D,,,1,0,gabarit,test
+P128,"Je dois faire une IRM du sein avec produit de contraste, vous avez de la place quand ?",nouveau_rdv,,cote,IRM_SEI_G_INJ|IRM_SEI_D_INJ,0,0,gabarit,train
+P129,"Bon, vous ne comprenez rien, allô ? Oui, il me faudrait une IRM du bras gauche avec produit de contraste, vous faites ça chez vous ?",nouveau_rdv,IRM_BRA_G_INJ,,,1,0,gabarit,test
+P130,"Bonjour, j'ai une ordonnance pour une IRM de la cuisse côté gauche avec produit de contraste, c'est possible cette semaine ?",nouveau_rdv,IRM_CUI_G_INJ,,,0,0,gabarit,train
+P131,"Je dois faire une IRM du pied gauche avec injection, vous avez de la place quand ?",nouveau_rdv,IRM_PIE_G_INJ,,,0,0,gabarit,train
+P132,"Ça fait trois fois que je répète, mon médecin m'a prescrit une IRM de l'épaule droite avec injection, je voudrais un créneau.",nouveau_rdv,IRM_EPA_D_INJ,,,1,0,gabarit,train
+P133,"Ça fait vingt minutes que j'attends, oui allô, c'est pour une écho du sein côté gauche s'il vous plaît.",nouveau_rdv,ECH_SEI_G,,,1,0,gabarit,train
+P134,On m'a dit d'appeler ici pour une radiographie du poignet droit.,nouveau_rdv,RX_POI_D,,,0,0,gabarit,test
+P135,"Je dois faire une IRM de l'épaule côté droit avec injection, vous avez de la place quand ?",nouveau_rdv,IRM_EPA_D_INJ,,,0,0,gabarit,train
+P136,"Bon, vous ne comprenez rien, bonsoir, je souhaiterais réserver une échographie abdomino-pelvienne.",nouveau_rdv,ECH_ABP,,,1,0,gabarit,test
+P137,"Salut, euh, je cherche un créneau pour une radiographie du dos.",nouveau_rdv,RX_RDO,,,0,0,gabarit,test
+P138,"C'est pour ma mère, elle doit passer une radiographie de la face.",nouveau_rdv,RX_FAC,,,0,0,gabarit,train
+P139,"J'appelle pour une radio de squelette, j'ai l'ordonnance du docteur.",nouveau_rdv,RX_SQU,,,0,0,gabarit,train
+P140,Encore ce robot... Est-ce que je peux avoir un rendez-vous pour une radio de la hanche droite la semaine prochaine ?,nouveau_rdv,RX_HAN_D,,,1,0,gabarit,train
+P141,"Allô ? Oui, il me faudrait une IRM du pied gauche avec injection, vous faites ça chez vous ?",nouveau_rdv,IRM_PIE_G_INJ,,,0,0,gabarit,test
+P142,"Bonsoir, je souhaiterais réserver un scanner de l'avant-bras côté droit.",nouveau_rdv,TDM_ABR_D,,,0,0,gabarit,test
+P143,"J'ai un peu peur de l'examen, mais C'est pour ma mère, elle doit passer une IRM de la hanche côté droit.",nouveau_rdv,IRM_HAN_D,,,0,0,gabarit,train
+P144,"Je suis un peu stressé, oui allô, c'est pour un scan du crâne s'il vous plaît.",nouveau_rdv,TDM_CRA,,,0,0,gabarit,train
+P145,"J'ai un peu peur de l'examen, mais Salut, euh, je cherche un créneau pour une IRM de la hanche avec produit de contraste.",nouveau_rdv,,cote,IRM_HAN_G_INJ|IRM_HAN_D_INJ,0,0,gabarit,test
+P146,"Salut, euh, je cherche un créneau pour une échographie des testicules.",nouveau_rdv,ECH_BOU,,,0,0,gabarit,test
+P147,"J'ai un peu peur de l'examen, mais Allô ? Oui, il me faudrait un scanner du crâne avec injection, vous faites ça chez vous ?",nouveau_rdv,TDM_CRA_INJ,,,0,0,gabarit,test
+P148,"Encore ce robot... Je dois faire un scan de l'avant-bras gauche, vous avez de la place quand ?",nouveau_rdv,TDM_ABR_G,,,1,0,gabarit,train
+P149,"Allô ? Oui, il me faudrait une IRM du bras gauche, vous faites ça chez vous ?",nouveau_rdv,IRM_BRA_G,,,0,0,gabarit,test
+P150,Je dois annuler mon rendez-vous de demain.,rdv_existant,,,,0,0,gabarit,train
+P151,Je voulais confirmer mon rendez-vous pour un scan du crâne avec produit de contraste.,rdv_existant,TDM_CRA_INJ,,,0,0,gabarit,train
+P152,"Franchement c'est pénible, je ne me souviens plus de l'heure de mon rendez-vous le 14.",rdv_existant,,,,1,0,gabarit,test
+P153,Vous pouvez supprimer mon rendez-vous pour une radio du bassin ?,rdv_existant,RX_BAS,,,0,0,gabarit,test
+P154,"Bonjour, il faudrait décaler mon examen de jeudi prochain, j'ai un empêchement.",rdv_existant,,,,0,0,gabarit,test
+P155,Je ne me souviens plus de l'heure de mon rendez-vous vendredi matin.,rdv_existant,,,,0,0,gabarit,test
+P156,Est-ce que mon rendez-vous pour une IRM de la hanche côté droit avec produit de contraste est toujours maintenu ?,rdv_existant,IRM_HAN_D_INJ,,,0,0,gabarit,train
+P157,"Je suis un peu stressé, à quelle heure est mon rendez-vous demain déjà ?",rdv_existant,,,,0,0,gabarit,train
+P158,"Franchement c'est pénible, bonjour, il faudrait décaler mon examen de demain, j'ai un empêchement.",rdv_existant,,,,1,0,gabarit,test
+P159,Est-ce que mon rendez-vous pour une IRM de la cuisse droite est toujours maintenu ?,rdv_existant,IRM_CUI_D,,,0,0,gabarit,train
+P160,Je voudrais déplacer mon rendez-vous de une IRM du dos prévu cet après-midi.,rdv_existant,IRM_RDO,,,0,0,gabarit,train
+P161,Je dois annuler mon rendez-vous de jeudi prochain.,rdv_existant,,,,0,0,gabarit,train
+P162,Encore ce robot... Je ne me souviens plus de l'heure de mon rendez-vous vendredi matin.,rdv_existant,,,,1,0,gabarit,test
+P163,J'ai rendez-vous demain mais je ne pourrai pas venir.,rdv_existant,,,,0,0,gabarit,train
+P164,Je vous l'ai déjà dit ! Je dois annuler mon rendez-vous de demain.,rdv_existant,,,,1,0,gabarit,train
+P165,"Franchement c'est pénible, je voudrais déplacer mon rendez-vous de une radiographie de la cheville côté droit prévu le 14.",rdv_existant,RX_CHE_D,,,1,0,gabarit,train
+P166,"Bonjour, il faudrait décaler mon examen de demain, j'ai un empêchement.",rdv_existant,,,,0,0,gabarit,test
+P167,"C'est la troisième fois que j'appelle, bonjour, il faudrait décaler mon examen de vendredi matin, j'ai un empêchement.",rdv_existant,,,,1,0,gabarit,test
+P168,J'ai rendez-vous le 14 mais je ne pourrai pas venir.,rdv_existant,,,,0,0,gabarit,train
+P169,Vous pouvez supprimer mon rendez-vous pour une radio de la main côté gauche ?,rdv_existant,RX_MAI_G,,,0,0,gabarit,test
+P170,"C'est la troisième fois que j'appelle, j'ai rendez-vous jeudi prochain mais je ne pourrai pas venir.",rdv_existant,,,,1,0,gabarit,train
+P171,"Bonjour, il faudrait décaler mon examen de vendredi matin, j'ai un empêchement.",rdv_existant,,,,0,0,gabarit,test
+P172,"Ça fait vingt minutes que j'attends, j'ai rendez-vous cet après-midi mais je ne pourrai pas venir.",rdv_existant,,,,1,0,gabarit,train
+P173,"Ça fait vingt minutes que j'attends, je voulais confirmer mon rendez-vous pour une IRM de l'épaule droite avec produit de contraste.",rdv_existant,IRM_EPA_D_INJ,,,1,0,gabarit,train
+P174,Je voulais confirmer mon rendez-vous pour une IRM de la hanche côté droit.,rdv_existant,IRM_HAN_D,,,0,0,gabarit,train
+P175,"Je suis un peu stressé, à quelle heure est mon rendez-vous lundi déjà ?",rdv_existant,,,,0,0,gabarit,train
+P176,"Bon, vous ne comprenez rien, j'ai rendez-vous demain mais je ne pourrai pas venir.",rdv_existant,,,,1,0,gabarit,train
+P177,"J'ai un peu peur de l'examen, mais Bonjour, il faudrait décaler mon examen de demain, j'ai un empêchement.",rdv_existant,,,,0,0,gabarit,test
+P178,Je ne me souviens plus de l'heure de mon rendez-vous cet après-midi.,rdv_existant,,,,0,0,gabarit,test
+P179,"Franchement c'est pénible, je dois annuler mon rendez-vous de le 14.",rdv_existant,,,,1,0,gabarit,train
+P180,Est-ce que mon rendez-vous pour une radio du bras droit est toujours maintenu ?,rdv_existant,RX_BRA_D,,,0,0,gabarit,train
+P181,"Franchement c'est pénible, j'ai rendez-vous demain mais je ne pourrai pas venir.",rdv_existant,,,,1,0,gabarit,train
+P182,Je voulais confirmer mon rendez-vous pour une mammo du sein côté droit.,rdv_existant,MAM_SEI_D,,,0,0,gabarit,train
+P183,"C'est la troisième fois que j'appelle, vous pouvez supprimer mon rendez-vous pour un scanner de l'épaule côté droit ?",rdv_existant,TDM_EPA_D,,,1,0,gabarit,test
+P184,"Bonjour, il faudrait décaler mon examen de lundi, j'ai un empêchement.",rdv_existant,,,,0,0,gabarit,test
+P185,À quelle heure est mon rendez-vous vendredi matin déjà ?,rdv_existant,,,,0,0,gabarit,train
+P186,Est-ce que mon rendez-vous pour une écho de la hanche côté droit est toujours maintenu ?,rdv_existant,ECH_HAN_D,,,0,0,gabarit,train
+P187,Je ne me souviens plus de l'heure de mon rendez-vous demain.,rdv_existant,,,,0,0,gabarit,test
+P188,"Bon, vous ne comprenez rien, à quelle heure est mon rendez-vous vendredi matin déjà ?",rdv_existant,,,,1,0,gabarit,train
+P189,Je vous l'ai déjà dit ! À quelle heure est mon rendez-vous vendredi matin déjà ?,rdv_existant,,,,1,0,gabarit,train
+P190,Je voulais confirmer mon rendez-vous pour une IRM du pied droit.,rdv_existant,IRM_PIE_D,,,0,0,gabarit,train
+P191,Je voudrais déplacer mon rendez-vous de une IRM du pied côté droit prévu lundi.,rdv_existant,IRM_PIE_D,,,0,0,gabarit,train
+P192,"C'est la troisième fois que j'appelle, je voudrais déplacer mon rendez-vous de une écho des vaisseaux prévu demain.",rdv_existant,ECH_VAS,,,1,0,gabarit,train
+P193,Vous pouvez supprimer mon rendez-vous pour une IRM de la jambe côté droit ?,rdv_existant,IRM_JAM_D,,,0,0,gabarit,test
+P194,Je vous l'ai déjà dit ! Vous pouvez supprimer mon rendez-vous pour une IRM du pied côté droit avec injection ?,rdv_existant,IRM_PIE_D_INJ,,,1,0,gabarit,test
+P195,Vous pouvez supprimer mon rendez-vous pour une écho des reins ?,rdv_existant,ECH_REI,,,0,0,gabarit,test
+P196,"C'est la troisième fois que j'appelle, vous êtes ouverts le samedi ?",info_generale,,,,1,0,liste,train
+P197,Quels sont vos horaires d'ouverture ?,info_generale,,,,0,0,liste,train
+P198,C'est où exactement votre centre ?,info_generale,,,,0,0,liste,test
+P199,Encore ce robot... Il y a un parking près du centre ?,info_generale,,,,1,0,liste,train
+P200,Qu'est-ce que je dois apporter le jour de l'examen ?,info_generale,,,,0,0,liste,train
+P201,"Ça fait trois fois que je répète, vous prenez la carte vitale ?",info_generale,,,,1,0,liste,test
+P202,"J'ai un peu peur de l'examen, mais Vous pratiquez le tiers payant ?",info_generale,,,,0,0,liste,train
+P203,"Ça fait vingt minutes que j'attends, je reçois les résultats quand ?",info_generale,,,,1,0,liste,train
+P204,Le centre est accessible en fauteuil roulant ?,info_generale,,,,0,0,liste,test
+P205,Je peux venir accompagné ?,info_generale,,,,0,0,liste,train
+P206,Combien ça coûte sans mutuelle ?,info_generale,,,,0,0,liste,train
+P207,Comment je récupère mes images après l'examen ?,info_generale,,,,0,0,liste,test
+P208,Il y a un bus qui passe près de chez vous ?,info_generale,,,,0,0,liste,train
+P209,"Excusez-moi de vous déranger, vous êtes ouverts entre midi et deux ?",info_generale,,,,0,0,liste,train
+P210,Je peux payer par carte bancaire ?,info_generale,,,,0,0,liste,test
+P211,Encore ce robot... Les résultats sont envoyés à mon médecin ?,info_generale,,,,1,0,liste,train
+P212,Encore ce robot... Vous êtes conventionnés secteur 1 ?,info_generale,,,,1,0,liste,train
+P213,Il faut arriver combien de temps avant ?,info_generale,,,,0,0,liste,test
+P214,Je peux avoir un justificatif pour mon employeur ?,info_generale,,,,0,0,liste,train
+P215,Vous avez une salle d'attente pour les enfants ?,info_generale,,,,0,0,liste,train
+P216,Il faut être à jeun pour un scan du coude gauche ?,info_generale,TDM_CDE_G,,,0,0,gabarit,train
+P217,"Je suis un peu stressé, combien de temps dure un scan du thorax avec injection ?",info_generale,TDM_THO_INJ,,,0,0,gabarit,train
+P218,Je dois apporter quoi pour une IRM de l'avant-bras gauche ?,info_generale,IRM_ABR_G,,,0,0,gabarit,test
+P219,"Ça fait trois fois que je répète, combien de temps dure une échographie du genou droit ?",info_generale,ECH_GEN_D,,,1,0,gabarit,train
+P220,Je dois apporter quoi pour un scanner de la cheville droite ?,info_generale,TDM_CHE_D,,,0,0,gabarit,test
+P221,Je dois apporter quoi pour une IRM de la cuisse droite avec produit de contraste ?,info_generale,IRM_CUI_D_INJ,,,0,0,gabarit,test
+P222,Je dois apporter quoi pour un scanner du bras côté gauche ?,info_generale,TDM_BRA_G,,,0,0,gabarit,test
+P223,Combien de temps dure une IRM du genou gauche ?,info_generale,IRM_GEN_G,,,0,0,gabarit,train
+P224,"Ça fait vingt minutes que j'attends, il faut être à jeun pour une IRM du genou côté droit ?",info_generale,IRM_GEN_D,,,1,0,gabarit,train
+P225,Je dois apporter quoi pour une IRM abdomino-pelvienne avec injection ?,info_generale,IRM_ABP_INJ,,,0,0,gabarit,test
+P226,"Ça fait vingt minutes que j'attends, je dois apporter quoi pour un scan du cou ?",info_generale,TDM_COU,,,1,0,gabarit,test
+P227,Je dois apporter quoi pour une radiographie du rachis cervical ?,info_generale,RX_RCE,,,0,0,gabarit,test
+P228,Encore ce robot... Il faut être à jeun pour une IRM du dos ?,info_generale,IRM_RDO,,,1,0,gabarit,train
+P229,Je dois apporter quoi pour une échographie de l'épaule droite ?,info_generale,ECH_EPA_D,,,0,0,gabarit,test
+P230,"Je suis un peu stressé, combien de temps dure un scanner de la hanche côté droit ?",info_generale,TDM_HAN_D,,,0,0,gabarit,train
+P231,Est-ce que c'est grave si j'ai mal au genou depuis une semaine ?,autre,,,,0,1,liste,train
+P232,"Mon médecin hésite entre une IRM et un scanner, lequel vous me conseillez ?",autre,,,,0,1,liste,train
+P233,"Ça fait trois fois que je répète, j'ai une douleur dans la poitrine depuis ce matin, je viens quand ?",autre,,,,1,1,liste,test
+P234,"Excusez-moi de vous déranger, j'ai un pacemaker, je peux quand même passer l'IRM ?",autre,,,,0,1,liste,train
+P235,"Ça fait trois fois que je répète, je suis enceinte, est-ce que la radio est dangereuse pour le bébé ?",autre,,,,1,1,liste,train
+P236,Pouvez-vous m'expliquer ce que veut dire mon compte rendu ?,autre,,,,0,1,liste,test
+P237,"Le produit de contraste, ça peut me rendre malade ?",autre,,,,0,1,liste,train
+P238,"J'ai fait une allergie la dernière fois avec l'iode, je fais quoi ?",autre,,,,0,1,liste,train
+P239,"Je suis diabétique, je dois arrêter mon traitement avant le scanner ?",autre,,,,0,1,liste,test
+P240,"Mon fils est tombé, il a très mal au bras, c'est cassé vous pensez ?",autre,,,,0,1,liste,train
+P241,Est-ce que j'ai vraiment besoin de cette IRM ?,autre,,,,0,1,liste,train
+P242,"Je suis un peu stressé, mes résultats sont normaux ou pas ?",autre,,,,0,1,liste,test
+P243,"Excusez-moi de vous déranger, j'ai des vertiges depuis hier, quel examen je dois faire ?",autre,,,,0,1,liste,train
+P244,C'est mieux une écho ou une radio pour une entorse ?,autre,,,,0,1,liste,train
+P245,"J'ai une prothèse de hanche, ça pose problème pour l'IRM ?",autre,,,,0,1,liste,test
+P246,"Je suis claustrophobe, vous pouvez me donner un calmant ?",autre,,,,0,1,liste,train
+P247,"C'est la troisième fois que j'appelle, le radiologue a vu quelque chose sur mon scanner ?",autre,,,,1,1,liste,train
+P248,"J'ai du mal à respirer, est-ce que je dois venir aujourd'hui ?",autre,,,,0,1,liste,test
+P249,"Bon, vous ne comprenez rien, je prends des anticoagulants, c'est un problème pour l'examen ?",autre,,,,1,1,liste,train
+P250,"Combien de rayons je reçois avec un scanner, c'est risqué ?",autre,,,,0,1,liste,train
+P251,"J'ai une bosse dans le sein, c'est urgent ?",autre,,,,0,1,liste,test
+P252,"Je suis un peu stressé, mon IRM de l'an dernier montrait une hernie, elle a grossi d'après vous ?",autre,,,,0,1,liste,train
+P253,"Mon médecin n'a pas précisé le côté, vous pouvez choisir pour moi ?",autre,,,,0,1,liste,train
+P254,"Je suis un peu stressé, je saigne du nez depuis une heure, qu'est-ce que je dois faire ?",autre,,,,0,1,liste,test
+P255,Je voudrais parler à une secrétaire s'il vous plaît.,autre,,,,0,0,liste,train
+P256,"C'est la troisième fois que j'appelle, c'est pour une réclamation sur ma facture.",autre,,,,1,0,liste,train
+P257,Je crois que je me suis trompé de numéro.,autre,,,,0,0,liste,test
+P258,"Franchement c'est pénible, vous faites les prises de sang ?",autre,,,,1,0,liste,train
+P259,Je cherche à joindre le docteur Martin.,autre,,,,0,0,liste,train
+P260,"Je suis livreur, je ne trouve pas l'entrée.",autre,,,,0,0,liste,test
+P261,Je vous l'ai déjà dit ! Je voudrais postuler comme manipulateur radio.,autre,,,,1,0,liste,train
+P262,Allô ? Allô ? Vous m'entendez ?,autre,,,,0,0,liste,train
+P263,Quel temps il fait demain ?,autre,,,,0,0,liste,test
+P264,Je voudrais un rendez-vous chez le dentiste.,autre,,,,0,0,liste,train
+P265,"Ça fait vingt minutes que j'attends, c'est bien la pharmacie ?",autre,,,,1,0,liste,train
+P266,Je veux parler à un humain.,autre,,,,0,0,liste,test
+P267,Je rappelle pour le message que vous m'avez laissé.,autre,,,,0,0,liste,train
+P268,"Je suis commercial, je voudrais présenter nos produits.",autre,,,,0,0,liste,train
+P269,"Ma mutuelle refuse de rembourser, vous pouvez m'aider ?",autre,,,,0,0,liste,test
+P270,"Ça fait trois fois que je répète, j'ai oublié mon parapluie dans la salle d'attente.",autre,,,,1,0,liste,train
