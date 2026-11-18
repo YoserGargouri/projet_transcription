@@ -2,7 +2,7 @@
 Données du catalogue d'un pack : éléments, attributs, gazetteer, paires confondables.
 
 Le moteur ne connaît que des « éléments » ayant un identifiant, un libellé et des attributs
-(colonnes déclarées dans domain.yaml). Ce que sont ces éléments (examens, vélos, voyages...)
+(colonnes déclarées dans domain.yaml). Ce que sont ces éléments (produits, prestations, voyages...)
 ne regarde que le pack.
 """
 from __future__ import annotations

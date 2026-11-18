@@ -161,7 +161,7 @@ class CalendarTool(Tool):
     def move(self, p: Move) -> dict:
         r = self._ligne(p.reference)
         if r["status"] != "booked":
-            raise ToolError("rendez-vous annulé : impossible de le déplacer")
+            raise ToolError("réservation annulée : impossible de la déplacer")
         duree = datetime.fromisoformat(r["end"]) - datetime.fromisoformat(r["start"])
         fin = p.new_start + duree
         if not self._dans_horaires(p.new_start, fin) or not self._libre(r["resource"], p.new_start, fin, r["reference"]):

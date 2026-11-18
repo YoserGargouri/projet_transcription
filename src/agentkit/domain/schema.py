@@ -46,6 +46,10 @@ class Persona(Strict):
     handoff_message: str = Field(description="Message dit avant un transfert vers un humain")
     fallback_message: str = Field(description="Message quand la demande n'est pas comprise")
     goodbye_message: str = Field("Merci, au revoir.", description="Fin de conversation")
+    not_found_message: str = Field("Je ne trouve pas cela dans notre catalogue.",
+                                   description="Combinaison demandée absente du catalogue")
+    change_prompt: str = Field("D'accord. Que souhaitez-vous modifier ?",
+                               description="Réponse quand l'utilisateur refuse le récapitulatif")
 
 
 class ScopeRule(Strict):

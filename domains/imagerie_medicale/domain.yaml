@@ -19,6 +19,8 @@ persona:
   handoff_message: Je vous mets en relation avec une personne du secrétariat, merci de patienter.
   fallback_message: Excusez-moi, je n'ai pas bien compris. Pouvez-vous reformuler votre demande ?
   goodbye_message: Merci de votre appel, au revoir.
+  not_found_message: Cet examen ne figure pas dans notre catalogue.
+  change_prompt: D'accord. Que souhaitez-vous corriger ?
 
 scope:
   description: prendre, déplacer, annuler ou consulter un rendez-vous d'imagerie, et donner des informations pratiques non médicales.

@@ -3,7 +3,7 @@ Garde-fous : périmètre de l'agent et scripts de sécurité fixes.
 
 - ScopeGuard : un sujet interdit par le pack (scope.forbidden) déclenche le transfert humain,
   sans jamais passer par le LLM. Les motifs « faibles » ne comptent pas quand l'intention
-  détectée figure dans except_if_intents (un symptôme cité en prenant rendez-vous).
+  détectée figure dans except_if_intents (ex. un symptôme cité au passage pendant une réservation).
 - SafetyScripts : questions fixes posées avant l'action finale selon les attributs de
   l'élément choisi. Réponse positive -> humain ; réponse floue -> on repose une fois, puis
   humain (selon le pack). L'agent ne décide jamais seul et le LLM n'interprète pas la réponse.
