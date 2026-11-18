@@ -3,6 +3,11 @@ import argparse
 import random
 
 import pandas as pd
+from pathlib import Path
+
+# Dossier du pack de domaine : les chemins par défaut ne dépendent plus du dossier courant
+PACK = Path(__file__).resolve().parents[1]
+DATA = PACK / "data"
 
 SEED = 42
 
@@ -224,8 +229,8 @@ def generer(cat: pd.DataFrame, n_nouveau: int, n_existant: int, rng) -> list:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--catalogue", default="data/catalogue.csv")
-    ap.add_argument("--out", default="data/phrases_annotees.csv")
+    ap.add_argument("--catalogue", default=str(DATA / "catalogue.csv"))
+    ap.add_argument("--out", default=str(DATA / "phrases_annotees.csv"))
     ap.add_argument("--n-nouveau", type=int, default=150)
     ap.add_argument("--n-existant", type=int, default=50)
     args = ap.parse_args()

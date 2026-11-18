@@ -3,6 +3,11 @@ import argparse
 import re
 import unicodedata
 import pandas as pd
+from pathlib import Path
+
+# Dossier du pack de domaine : les chemins par défaut ne dépendent plus du dossier courant
+PACK = Path(__file__).resolve().parents[1]
+DATA = PACK / "data"
 
 # --- Modalités : mot de tête du libellé CCAM -> (modalité, préfixe de code) ---
 MODALITES = [
@@ -238,7 +243,7 @@ def main():
     ap.add_argument("--freq-code-col", help="Colonne du code acte dans Open CCAM")
     ap.add_argument("--freq-count-col", help="Colonne du nombre de réalisations")
     ap.add_argument("--n", type=int, default=180)
-    ap.add_argument("--out", default="data/catalogue.csv")
+    ap.add_argument("--out", default=str(DATA / "catalogue.csv"))
     args = ap.parse_args()
 
     acts = load_ccam(args.ccam)

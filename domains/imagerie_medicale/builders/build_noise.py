@@ -2,7 +2,7 @@
 Crée des versions dégradées des audios de test, pour mesurer la robustesse de Whisper.
 
 Usage (depuis la racine du projet) :
-    python src/preprocessing/build_noise.py
+    python domains/imagerie_medicale/builders/build_noise.py
 
 Pour chaque audio « propre » de data/audio/manifest.csv, on crée :
     <id>_snr20.wav   bruit de fond léger   (rapport signal/bruit 20 dB)
@@ -26,6 +26,10 @@ import numpy as np
 import pandas as pd
 import soundfile as sf
 from scipy.signal import butter, sosfilt
+
+# Dossier du pack de domaine : les chemins par défaut ne dépendent plus du dossier courant
+PACK = Path(__file__).resolve().parents[1]
+DATA = PACK / "data"
 
 SR = 16000
 SEED = 42
@@ -81,8 +85,8 @@ def effet_telephone(y: np.ndarray) -> np.ndarray:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--audio-dir", default="data/audio")
-    ap.add_argument("--noise-dir", default="data/raw/noise")
+    ap.add_argument("--audio-dir", default=str(DATA / "audio"))
+    ap.add_argument("--noise-dir", default=str(DATA / "raw/noise"))
     ap.add_argument("--n-bruits", type=int, default=6)
     ap.add_argument("--sans-telechargement", action="store_true")
     args = ap.parse_args()

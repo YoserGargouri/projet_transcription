@@ -4,16 +4,17 @@ Essai rapide de la transcription avec Whisper (faster-whisper).
 Usage (depuis la racine du projet) :
 
     # Parler au micro pendant 6 secondes, puis voir la transcription
-    python src/transcription/essai_whisper.py --micro 6
+    python -m agentkit.channels.audio.essai_stt --micro 6
 
     # Transcrire un fichier existant
-    python src/transcription/essai_whisper.py --fichier data/audio/S04.wav
+    python -m agentkit.channels.audio.essai_stt --fichier mon_audio.wav
 
     # Choisir un autre modèle : tiny, base, small (défaut), medium
-    python src/transcription/essai_whisper.py --micro 6 --modele base
+    python -m agentkit.channels.audio.essai_stt --micro 6 --modele base
 
 Au premier lancement, le modèle est téléchargé une fois (small : environ 500 Mo).
 Le mode micro demande : pip install sounddevice
+La langue est celle du pack de domaine (--domaine), ou --langue pour la forcer.
 """
 import argparse
 import time
@@ -21,6 +22,8 @@ from pathlib import Path
 
 import numpy as np
 import soundfile as sf
+
+from agentkit import config
 
 SR = 16000
 
@@ -41,7 +44,7 @@ def enregistrer(secondes: float, chemin: Path) -> Path:
     return chemin
 
 
-def transcrire(chemin: Path, nom_modele: str):
+def transcrire(chemin: Path, nom_modele: str, langue: str | None):
     from faster_whisper import WhisperModel
 
     print(f"\nChargement du modèle Whisper « {nom_modele} »...")
@@ -51,7 +54,7 @@ def transcrire(chemin: Path, nom_modele: str):
 
     duree = sf.info(chemin).duration
     t0 = time.perf_counter()
-    segments, _ = modele.transcribe(str(chemin), language="fr", beam_size=5, word_timestamps=True)
+    segments, _ = modele.transcribe(str(chemin), language=langue, beam_size=5, word_timestamps=True)
     segments = list(segments)  # la transcription se fait réellement ici
     latence = time.perf_counter() - t0
 
@@ -75,15 +78,22 @@ def main():
     source.add_argument("--micro", type=float, metavar="SECONDES", help="enregistrer au micro")
     source.add_argument("--fichier", help="chemin d'un fichier audio")
     ap.add_argument("--modele", default="small", help="tiny, base, small, medium")
+    ap.add_argument("--domaine", default=config.domaine_par_defaut(), help="pack dont on prend la langue")
+    ap.add_argument("--langue", help="force la langue (ex. fr) ; sinon celle du pack")
     args = ap.parse_args()
 
     if args.micro:
-        chemin = enregistrer(args.micro, Path("data/audio/brut/essai_micro.wav"))
+        chemin = enregistrer(args.micro, config.runtime_dir("micro") / "essai_micro.wav")
     else:
         chemin = Path(args.fichier)
         if not chemin.exists():
             raise SystemExit(f"Fichier introuvable : {chemin}")
-    transcrire(chemin, args.modele)
+    langue = args.langue
+    if langue is None:
+        from agentkit.domain.loader import load_domain
+
+        langue = load_domain(args.domaine).language
+    transcrire(chemin, args.modele, langue)
 
 
 if __name__ == "__main__":

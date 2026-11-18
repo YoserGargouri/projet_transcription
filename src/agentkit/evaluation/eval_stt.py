@@ -1,31 +1,32 @@
 """
-Évalue les moteurs de transcription sur tous les audios de data/audio/manifest.csv.
+Évalue les moteurs de transcription sur les audios d'un pack de domaine
+(<pack>/data/audio/manifest.csv).
 
 Usage (depuis la racine du projet) :
-    python src/evaluation/eval_stt.py                          # whisper-small + vosk
-    python src/evaluation/eval_stt.py --moteurs whisper-base   # un seul moteur
-    python src/evaluation/eval_stt.py --limite 5               # essai rapide sur 5 audios
+    python -m agentkit.evaluation.eval_stt                          # whisper-small + vosk
+    python -m agentkit.evaluation.eval_stt --moteurs whisper-base   # un seul moteur
+    python -m agentkit.evaluation.eval_stt --limite 5               # essai rapide sur 5 audios
+    python -m agentkit.evaluation.eval_stt --moteurs elevenlabs     # consomme des crédits ElevenLabs
+    python -m agentkit.evaluation.eval_stt --domaine autre_pack     # autre pack (langue du pack)
 
 Produit :
-    data/results/stt_details.csv  une ligne par audio et par moteur (texte attendu / obtenu)
-    data/results/stt_resume.csv   le tableau WER moteur x condition
+    results/<pack>/stt_details.csv  une ligne par audio et par moteur (texte attendu / obtenu)
+    results/<pack>/stt_resume.csv   le tableau WER moteur x condition
 et affiche les résultats dans le terminal.
 
 WER (Word Error Rate) = (mots remplacés + supprimés + ajoutés) / nombre de mots attendus.
 0 % = transcription parfaite. Majuscules et ponctuation sont ignorées.
 """
 import argparse
-import sys
 from pathlib import Path
 
 import jiwer
 import librosa
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "src"))
-from transcription.qualite import estimer_snr  # noqa: E402
-from transcription.stt import MOTEURS  # noqa: E402
+from agentkit import config
+from agentkit.channels.audio.quality import estimer_snr
+from agentkit.channels.audio.stt import MOTEURS, creer_moteur
 
 NORMALISATION = jiwer.Compose([
     jiwer.SubstituteRegexes({r"[-’]": " "}),
@@ -82,13 +83,19 @@ def resumer(det: pd.DataFrame) -> pd.DataFrame:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--manifest", default="data/audio/manifest.csv")
+    ap.add_argument("--domaine", default=config.domaine_par_defaut(), help="pack de domaine évalué")
+    ap.add_argument("--manifest", help="par défaut : <pack>/data/audio/manifest.csv")
     ap.add_argument("--moteurs", nargs="+", default=["whisper-small", "vosk"], choices=list(MOTEURS))
     ap.add_argument("--limite", type=int, help="ne traiter que les N premiers audios (essai)")
-    ap.add_argument("--out-dir", default="data/results")
+    ap.add_argument("--out-dir", help="par défaut : results/<pack>/")
     args = ap.parse_args()
 
-    manifest_path = Path(args.manifest)
+    from agentkit.domain.loader import load_domain
+
+    pack = load_domain(args.domaine)
+    manifest_path = Path(args.manifest) if args.manifest else pack.root / "data" / "audio" / "manifest.csv"
+    if not args.out_dir:
+        args.out_dir = str(config.REPO_ROOT / "results" / pack.id)
     audios = pd.read_csv(manifest_path, keep_default_na=False)
     audios = audios[audios["statut"] == "ok"]
     if args.limite:
@@ -99,7 +106,7 @@ def main():
     for nom in args.moteurs:
         print(f"\nChargement de {nom}...")
         try:
-            moteur = MOTEURS[nom]()
+            moteur = creer_moteur(nom, langue=pack.language)
         except Exception as e:  # modèle non téléchargeable, bibliothèque absente...
             print(f"  {nom} ignoré : {e}")
             continue

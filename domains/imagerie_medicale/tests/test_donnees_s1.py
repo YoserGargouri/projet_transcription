@@ -2,12 +2,13 @@
 Tests automatiques des données de la S1.
 
 Usage (depuis la racine du projet) :
-    pip install pytest
-    pytest tests/ -v
+    python -m pytest domains/imagerie_medicale -v
 
 Chaque test vérifie une règle précise ; en cas d'échec, le message dit quoi corriger.
 Les tests audio sont ignorés (SKIPPED) tant que data/audio/manifest.csv n'existe pas.
 """
+import importlib.util
+import io
 import re
 import subprocess
 from pathlib import Path
@@ -17,11 +18,21 @@ import pandas as pd
 import pytest
 import soundfile as sf
 
-ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "data"
+PACK = Path(__file__).resolve().parents[1]   # dossier du pack de domaine
+DATA = PACK / "data"
+TAG_GEL = "v0-test-gele"
+CHEMIN_TAGUE = "data/phrases_annotees.csv"  # chemin du fichier au moment du gel
 
 MODALITES = {"IRM", "Scanner", "Radio", "Échographie", "Mammographie", "Densitométrie"}
 BRANCHES = {"nouveau_rdv", "rdv_existant", "info_generale", "autre"}
+
+
+def charger_builder(nom):
+    """Importe un script de builders/ par son chemin (le pack n'est pas un paquet Python)."""
+    spec = importlib.util.spec_from_file_location(nom, PACK / "builders" / f"{nom}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def lire(nom):
@@ -151,18 +162,41 @@ class TestPhrases:
             taux = phrases[phrases["split"] == s]["frustration"].mean()
             assert 0.1 <= taux <= 0.5, f"frustration en {s} = {taux:.0%} (10 à 50 % attendus)"
 
-    def test_jeu_de_test_gele(self):
-        """Les phrases n'ont pas bougé depuis le tag Git v0-test-gele."""
+    def test_jeu_de_test_gele(self, phrases):
+        """Les lignes split=test n'ont pas bougé depuis le tag Git v0-test-gele.
+
+        Le tag a été posé avant le déplacement du fichier : on compare le contenu tagué
+        (ancien chemin) avec le fichier actuel (nouveau chemin). Seules les lignes de test
+        sont gelées : on peut ajouter des phrases d'entraînement sans casser le gel.
+        """
         try:
-            tag = subprocess.run(["git", "rev-parse", "--verify", "--quiet", "v0-test-gele"],
-                                 cwd=ROOT, capture_output=True)
+            r = subprocess.run(["git", "show", f"{TAG_GEL}:{CHEMIN_TAGUE}"], cwd=PACK, capture_output=True)
         except FileNotFoundError:
             pytest.skip("git non disponible")
-        if tag.returncode != 0:
-            pytest.skip("tag v0-test-gele absent")
-        r = subprocess.run(["git", "diff", "--quiet", "v0-test-gele", "--", "data/phrases_annotees.csv"],
-                           cwd=ROOT, capture_output=True)
-        assert r.returncode == 0, "phrases_annotees.csv a changé depuis le gel du test !"
+        if r.returncode != 0:
+            pytest.skip(f"tag {TAG_GEL} absent (dépôt cloné sans les tags ?)")
+        gele = pd.read_csv(io.BytesIO(r.stdout), keep_default_na=False)
+        gele = gele[gele["split"] == "test"].sort_values("id").reset_index(drop=True)
+        actuel = phrases[phrases["split"] == "test"].sort_values("id").reset_index(drop=True)
+        assert list(actuel.columns) == list(gele.columns), "colonnes modifiées depuis le gel"
+        diff = actuel.compare(gele) if actuel.shape == gele.shape else None
+        assert diff is not None and diff.empty, (
+            f"lignes de test modifiées depuis {TAG_GEL} ({len(gele)} gelées, {len(actuel)} actuelles)")
+
+    def test_pas_de_fuite_train_test(self, phrases):
+        """Aucune phrase d'entraînement ne recopie une phrase de test, ni n'utilise un
+        gabarit réservé au test (sinon le test mesurerait de la mémorisation)."""
+        norm = lambda t: re.sub(r"\s+", " ", t.lower()).strip()  # noqa: E731
+        train, test = phrases[phrases["split"] == "train"], phrases[phrases["split"] == "test"]
+        doublons = set(map(norm, train["texte"])) & set(map(norm, test["texte"]))
+        assert not doublons, f"phrases présentes en train ET en test : {sorted(doublons)[:5]}"
+
+        bp = charger_builder("build_phrases")
+        gabarits = bp.GABARITS_NOUVEAU + bp.GABARITS_EXISTANT + bp.GABARITS_INFO_EXAMEN
+        motifs = [re.compile(re.escape(g).replace(re.escape("{exam}"), ".+").replace(re.escape("{jour}"), ".+")
+                             + "$", re.IGNORECASE) for g, split in gabarits if split == "test"]
+        fuites = [t for t in train["texte"] if any(m.search(t) for m in motifs)]
+        assert not fuites, f"phrases d'entraînement construites sur un gabarit de test : {fuites[:5]}"
 
 
 # --- Étapes 5 et 6 : audios ------------------------------------------------------------

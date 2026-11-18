@@ -4,7 +4,7 @@ Prépare les audios de test pour la transcription (Whisper).
 Deux commandes, à lancer depuis la racine du projet :
 
 1) Voix synthétiques + fiche d'enregistrement des voix réelles
-    python src/preprocessing/build_audio.py synth
+    python domains/imagerie_medicale/builders/build_audio.py synth
 
    - choisit 20 phrases du jeu de TEST (toutes les branches, des phrases agacées,
      des pièges médicaux, des phrases incomplètes) ;
@@ -16,7 +16,7 @@ Deux commandes, à lancer depuis la racine du projet :
 2) Voix réelles : après avoir enregistré les phrases (voir manifest.csv, lignes
    type = reel), placez les fichiers WAV dans data/audio/brut/ en les nommant avec
    leur audio_id (ex. R01.wav), puis :
-    python src/preprocessing/build_audio.py normaliser
+    python domains/imagerie_medicale/builders/build_audio.py normaliser
 
    Chaque fichier est converti en 16 kHz mono, volume normalisé, dans data/audio/.
 
@@ -31,6 +31,10 @@ import librosa
 import numpy as np
 import pandas as pd
 import soundfile as sf
+
+# Dossier du pack de domaine : les chemins par défaut ne dépendent plus du dossier courant
+PACK = Path(__file__).resolve().parents[1]
+DATA = PACK / "data"
 
 SR = 16000
 SEED = 42
@@ -126,12 +130,12 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="commande", required=True)
     s = sub.add_parser("synth", help="voix synthétiques + fiche d'enregistrement")
-    s.add_argument("--phrases", default="data/phrases_annotees.csv")
+    s.add_argument("--phrases", default=str(DATA / "phrases_annotees.csv"))
     s.add_argument("--n", type=int, default=20)
-    s.add_argument("--out-dir", default="data/audio")
+    s.add_argument("--out-dir", default=str(DATA / "audio"))
     s.set_defaults(func=synth)
     n = sub.add_parser("normaliser", help="convertit les enregistrements de data/audio/brut/")
-    n.add_argument("--out-dir", default="data/audio")
+    n.add_argument("--out-dir", default=str(DATA / "audio"))
     n.set_defaults(func=normaliser)
     args = ap.parse_args()
     args.func(args)

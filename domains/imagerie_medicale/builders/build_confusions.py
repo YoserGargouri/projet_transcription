@@ -2,6 +2,11 @@ import argparse
 from itertools import combinations
 
 import pandas as pd
+from pathlib import Path
+
+# Dossier du pack de domaine : les chemins par défaut ne dépendent plus du dossier courant
+PACK = Path(__file__).resolve().parents[1]
+DATA = PACK / "data"
 
 # Modalités que les patients confondent souvent entre elles
 MODALITES_PROCHES = [
@@ -71,8 +76,8 @@ def paires(cat: pd.DataFrame):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--catalogue", default="data/catalogue.csv")
-    ap.add_argument("--out", default="data/confusions.csv")
+    ap.add_argument("--catalogue", default=str(DATA / "catalogue.csv"))
+    ap.add_argument("--out", default=str(DATA / "confusions.csv"))
     args = ap.parse_args()
 
     # keep_default_na=False : sinon pandas lit la latéralité "aucune"... et d'autres valeurs comme vides
