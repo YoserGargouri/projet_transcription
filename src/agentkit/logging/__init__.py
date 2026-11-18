@@ -1,0 +1,1 @@
+"""Journaux de conversation anonymisés."""

@@ -25,7 +25,6 @@ on_complete:
   arguments:
     resource: "{item.modalite}"
     start: "{slots.creneau}"
-    duration_min: "{item.duree_min}"
     item_id: "{item.code}"
     contact: "{slots.nom} {slots.telephone}"
 success_message: "C'est noté, votre référence est {result.reference}. Pensez à apporter votre ordonnance. Préparation : {item.preparation}."

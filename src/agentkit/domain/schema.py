@@ -110,11 +110,17 @@ class AttributeSpec(Strict):
     question: str | None = Field(None, description="Question de désambiguïsation ; {options} = valeurs possibles")
     option_labels: dict[str, str] = Field(default_factory=dict, description="Libellé oral de chaque valeur")
     fuzzy: bool = Field(True, description="Recherche floue autorisée pour cet attribut")
+    match_values: bool = Field(True, description="Reconnaître les valeurs brutes du catalogue comme formes "
+                                                 "orales (false pour des codes comme G/D ou oui/non)")
 
     @model_validator(mode="after")
     def _coherence(self):
         if self.on_missing == "default" and self.default is None:
             raise ValueError(f"attribut {self.name} : on_missing=default demande une valeur default")
+        if self.on_missing == "ask" and not self.question:
+            raise ValueError(f"attribut {self.name} : on_missing=ask demande une question")
+        if self.question and "{options}" not in self.question and self.on_missing == "ask":
+            raise ValueError(f"attribut {self.name} : la question doit contenir {{options}}")
         return self
 
 
@@ -136,7 +142,12 @@ class ConfusionsSpec(Strict):
 class ConfidenceSettings(Strict):
     accept: float = Field(0.75, ge=0, le=1, description="Au-dessus : élément retenu")
     confirm: float = Field(0.5, ge=0, le=1, description="Entre confirm et accept : retenu mais à faire confirmer")
-    confusable_penalty: float = Field(0.7, ge=0, le=1, description="Multiplicateur si paire confondable")
+    confusable_penalty: float = Field(0.7, ge=0, le=1,
+                                      description="Multiplicateur si l'élément a un jumeau confondable sur un "
+                                                  "attribut reconnu en flou")
+    default_penalty: float = Field(0.9, ge=0, le=1,
+                                   description="Multiplicateur si le jumeau confondable diffère sur un attribut "
+                                               "fixé par sa valeur par défaut")
 
 
 class CatalogueSpec(Strict):
@@ -151,6 +162,7 @@ class CatalogueSpec(Strict):
     confusions: ConfusionsSpec | None = None
     confidence: ConfidenceSettings = Field(default_factory=ConfidenceSettings)
     shortlist_size: int = Field(15, ge=2, le=50, description="Candidats max montrés au LLM")
+    options_joiner: str = Field(" ou ", description="Mot placé avant la dernière option d'une question")
 
     @model_validator(mode="after")
     def _noms_uniques(self):

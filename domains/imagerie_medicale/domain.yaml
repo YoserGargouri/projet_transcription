@@ -198,12 +198,14 @@ catalogue:
       on_missing: ask
       question: Sur votre ordonnance, est-il écrit {options} ?
     - name: lateralite
+      match_values: false
       column: lateralite
       on_missing: ask
       not_applicable: [aucune]
       question: Votre ordonnance précise-t-elle le côté, {options} ?
       option_labels: {G: gauche, D: droit, bilatéral: les deux côtés}
     - name: injection
+      match_values: false
       column: injection
       on_missing: default
       default: non

@@ -48,6 +48,7 @@ catalogue:
       question: Quel type de vélo souhaitez-vous, {options} ?
       option_labels: {ville: de ville, vtt: un VTT, electrique: électrique, enfant: enfant, cargo: cargo}
     - name: taille
+      match_values: false
       column: taille
       question: Quelle taille, {options} ?
       option_labels: {S: petite, M: moyenne, L: grande}
