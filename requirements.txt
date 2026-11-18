@@ -1,9 +1,10 @@
-faster-whisper
-vosk
-jiwer
-librosa
-soundfile
-numpy
-pandas
-gTTS
-piper-tts
+# Installation complète pour le développement (moteur + audio + modèles + démo + tests).
+# Les dépendances sont déclarées dans pyproject.toml ; ce fichier ne fait que les sélectionner.
+#
+#   python -m venv venv
+#   venv\Scripts\activate
+#   pip install -r requirements.txt
+#
+# TTS hors ligne Piper (facultatif, parfois difficile à installer sous Windows) :
+#   pip install -e .[piper]
+-e .[audio,ml,app,dev]
