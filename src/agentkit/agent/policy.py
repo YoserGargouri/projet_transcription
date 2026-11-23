@@ -117,7 +117,9 @@ class SingleCallPolicy(AgentPolicy):
                     pass
             return self.rules.decide(ctx, fallback="sortie_llm_invalide")
         except LLMError as e:                                   # réseau, budget, quota...
-            return self.rules.decide(ctx, fallback=f"llm_indisponible:{type(e).__name__}")
+            # La cause est gardée dans la trace (délai dépassé, 503...) : sans elle, le journal
+            # ne permet pas de savoir pourquoi le tour s'est replié sur les règles.
+            return self.rules.decide(ctx, fallback=f"llm_indisponible:{type(e).__name__}:{str(e)[:160]}")
         return self._decision(sortie)
 
     @staticmethod
