@@ -25,3 +25,24 @@ optimiste. Ce jeu mesure la vraie généralisation.
 | Phrases générées (split test) | plafond optimiste (même auteur que le gazetteer) |
 | Phrases aveugles | généralisation à des formulations inconnues |
 | Transcriptions Whisper réelles | robustesse aux erreurs de transcription |
+
+## FAQ : reformulations aveugles (`data/faq/faq_aveugle.csv`)
+
+Même règle : le rédacteur ne lit ni `faq.csv` (questions et variantes) ni `faq_dev.csv`.
+On lui donne seulement la **liste des thèmes** (horaires, accès, documents, paiement,
+résultats, délais) et il écrit **20 à 30 questions** comme un vrai appelant, dont quelques-unes
+hors FAQ (colonne `attendu` vide). L'annotation de la colonne `attendu` (id de fiche) se fait
+ensuite, avec `faq.csv` sous les yeux.
+
+Puis déclarer le jeu dans `domain.yaml` :
+
+```yaml
+evaluation:
+  knowledge:
+    - id: faq_aveugle
+      file: data/faq/faq_aveugle.csv
+      blind: true
+```
+
+et lancer `python -m agentkit.evaluation.eval_knowledge`. Ne plus jamais régler `min_score` /
+`min_gap` ensuite : le chiffre aveugle est celui du rapport.

@@ -94,6 +94,21 @@ LLM »), le résolveur garde un **point d'accroche hors ligne** (`CatalogueResol
 qui mesure le bot **seul** sur les phrases annotées, avec le même fragment de prompt que
 l'agent : la mesure reflète le fonctionnement réel, sans appel supplémentaire en conversation.
 
+## 4 bis. Base de connaissances : trois zones (phase 2)
+
+Une fiche n'est lue **directement** (0 appel LLM) que si elle est assez sûre
+(`min_score`) **et** nettement devant la 2e (`min_gap`) : deux fiches voisines presque à
+égalité (« samedi » / « dimanche », « fermeture le soir » / « ouvert le midi ») sont le cas
+typique d'erreur confiante. Entre `min_score - llm_margin` et ces seuils, c'est la **zone
+grise** : l'unique appel LLM du tour reçoit les `llm_top_k` meilleures fiches et renvoie
+`knowledge_id` (une de ces fiches, ou `null`) ; la réponse est **la fiche, mot pour mot**,
+jamais un texte rédigé par le LLM. Sans LLM, la zone grise devient « reformulez » puis un
+transfert. Objectif mesuré : **zéro réponse fausse** (une absence de réponse se rattrape,
+une information fausse non).
+
+Le routage du premier tour reste sans LLM ; évalué par `eval_router` sur les jeux déclarés
+dans `evaluation.intents` du pack.
+
 ## 5. Contrat de sortie de l'agent (D3)
 
 Le modèle pydantic de la sortie est **généré à chaque tour** à partir du pack
@@ -161,7 +176,8 @@ branche d'évaluation `rdv_existant` pour annuler / déplacer / consulter).
 ### 6.5 Connaissances, workflows, outils
 | Champ | Rôle |
 |---|---|
-| `knowledge` | FAQ CSV : colonnes `id` / `question` / `reponse` / `variantes`, `retriever` (`tfidf`), `min_score` |
+| `knowledge` | FAQ CSV : colonnes `id` / `question` / `reponse` / `variantes` ; `retriever` (`tfidf` / `embeddings` / `hybrid`), `embeddings_model`, `lexical_weight`, `min_score`, `min_gap`, `llm_margin`, `llm_top_k` |
+| `evaluation` | jeux d'évaluation : `intents[]` (`file`, `text_column`, `label_column`, `split_column`, `out_of_scope_column`, `escalate_label`), `knowledge[]` (`file`, `text_column`, `expected_column`, `blind`) |
 | `workflows[]` | chemin d'un YAML ou définition inline : `id`, `description`, `slots[]` (`name`, `type`, `required`, `prompt`, `pii`, `choices`, `pattern`), `confirmation`, `on_complete` (`tool`, `action`, `arguments` avec `{slots.x}`, `{item.x}`), `success_message` (`{result.x}`) |
 | `tools[]` | `name` + **`builtin`** (outil du moteur, configuré par `config`) **ou** `entrypoint` (`tools/<fichier>.py:<Classe>`, dans le pack, liste blanche) |
 
@@ -228,7 +244,7 @@ prompt du client ──► LLM générateur ──► domain.yaml + CSV + workfl
 | WP1 Données simulées | `domains/imagerie_medicale/data`, `builders/` | fait (S1) ; jeu aveugle à écrire |
 | WP2 STT + qualité | `channels/audio/stt.py`, `quality.py`, `evaluation/eval_stt.py` | fait ; confirmation en qualité moyenne : TODO |
 | WP2 TTS | `channels/audio/tts.py` (ElevenLabs, gTTS, Piper) | fait ; grille d'écoute : TODO |
-| WP3 Qualification + FAQ | `nlu/router.py`, `knowledge/retriever.py`, `domain.yaml` | baseline ; évaluation : phase 2 |
+| WP3 Qualification + FAQ | `nlu/router.py`, `knowledge/retriever.py`, `evaluation/eval_router.py`, `evaluation/eval_knowledge.py` | fait (phase 2) ; FAQ aveugle à écrire |
 | WP4 Bot niveau 1 (4 pts) | `nlu/resolver.py`, `disambiguation.py`, `gazetteer.yaml` | baseline ; évaluation gazetteer seul vs + LLM : phase 3 |
 | WP5 Détecteur de frustration (4 pts) | `signals/` | lexique ; MLP entraîné : phase 4 |
 | WP6 Agent niveau 2 (3 pts) | `agent/contract.py`, `agent/policy.py`, `workflows/`, `tools/builtin/calendar.py` | appel unique + JSON fait ; dates, créneaux : phase 5 |

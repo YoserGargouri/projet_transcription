@@ -56,6 +56,8 @@ Clés (`.env`, jamais versionné) :
 | Même chose avec gTTS (gratuit) | `python -m agentkit.channels.audio.tts --moteur gtts --out sortie.wav` |
 | Essai de transcription (micro 6 s) | `python -m agentkit.channels.audio.essai_stt --micro 6` |
 | Évaluation STT (WER) | `python -m agentkit.evaluation.eval_stt --moteurs whisper-small vosk` |
+| Routage du 1er tour (WP3, sans LLM) | `python -m agentkit.evaluation.eval_router --split test` |
+| FAQ : tfidf / embeddings / hybride (WP3) | `python -m agentkit.evaluation.eval_knowledge` |
 
 Données du pack (mêmes options qu'avant, chemins par défaut dans le pack) :
 
@@ -72,6 +74,9 @@ Le jeu de test (`split=test` de `phrases_annotees.csv`) est **gelé** par le tag
 (`domains/imagerie_medicale/data/phrases_aveugles/LISEZMOI.md`).
 
 ## État (phase 1 : architecture)
+
+Phase 2 (WP3) : routage évalué sur le test gelé (99,0 %, 8/8 hors périmètre transférés), FAQ
+hybride avec zone grise confiée à l'appel LLM du tour (0 réponse fausse sur le jeu de mise au point).
 
 Fait : contrat des packs, moteur générique, résolveur, routeur, FAQ, garde-fous, scripts de
 sécurité, agent à un appel par tour (FakeLLM), agenda simulé, journaux anonymisés, canal
