@@ -16,6 +16,7 @@ def environnement_isole(monkeypatch, tmp_path):
     for cle in CLES:
         monkeypatch.delenv(cle, raising=False)
     monkeypatch.setenv("AGENTKIT_RUNTIME", str(tmp_path / "runtime"))
+    monkeypatch.setenv("HF_HUB_OFFLINE", "1")        # aucun téléchargement de modèle pendant les tests
 
     def reseau_interdit(*a, **k):
         raise RuntimeError("accès réseau interdit pendant les tests")

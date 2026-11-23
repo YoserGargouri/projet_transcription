@@ -132,6 +132,15 @@ def verifier_fichiers(pack: DomainPack) -> list[str]:
             cols = _colonnes(f)
             err += [f"connaissances : colonne absente {col}" for col in
                     (k.id_column, k.question_column, k.answer_column, k.variants_column) if col and col not in cols]
+    jeux = [(d.id, d.file, [d.text_column, d.label_column, d.split_column, d.out_of_scope_column])
+            for d in pack.evaluation.intents]
+    jeux += [(d.id, d.file, [d.text_column, d.expected_column]) for d in pack.evaluation.knowledge]
+    for jid, fichier, colonnes in jeux:
+        if not pack.path(fichier).exists():
+            err.append(f"évaluation {jid} : fichier introuvable {fichier}")
+        else:
+            cols = _colonnes(pack.path(fichier))
+            err += [f"évaluation {jid} : colonne absente {c}" for c in colonnes if c and c not in cols]
     for t in pack.tools:
         if t.entrypoint and not pack.path(t.entrypoint.split(":")[0]).exists():
             err.append(f"outil {t.name} : fichier introuvable {t.entrypoint}")

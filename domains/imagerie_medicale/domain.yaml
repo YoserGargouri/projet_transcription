@@ -235,8 +235,13 @@ knowledge:
   question_column: question
   answer_column: reponse
   variants_column: variantes
-  retriever: tfidf
-  min_score: 0.35
+  retriever: hybrid
+  # Réglés sur le jeu de mise au point (faq_dev) : lecture directe seulement si la fiche est
+  # sûre ET nettement devant la suivante ; sinon l'appel LLM du tour choisit parmi les 3 premières.
+  min_score: 0.45
+  min_gap: 0.13
+  llm_margin: 0.15
+  llm_top_k: 3
 
 workflows:
   - workflows/booking.yaml
@@ -332,3 +337,18 @@ llm:
 logging:
   # Numéro de sécurité sociale (masqué en plus des motifs génériques)
   extra_patterns: ['\b[12]\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{3}\s?\d{3}\s?\d{2}\b']
+
+# Jeux d'évaluation (lus par les scripts génériques de src/agentkit/evaluation)
+evaluation:
+  intents:
+    - id: phrases
+      file: data/phrases_annotees.csv
+      text_column: texte
+      label_column: branche
+      split_column: split
+      out_of_scope_column: hors_perimetre
+      escalate_label: autre
+  knowledge:
+    - id: faq_dev
+      file: data/faq/faq_dev.csv
+      blind: false

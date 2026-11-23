@@ -153,12 +153,28 @@ class Orchestrator:
 
     # ================================================================== branches ==============
     def _knowledge(self, text: str, trace: dict) -> TurnResult:
-        hit = self.retriever.answer(text) if self.retriever else None
-        trace["knowledge"] = {"id": hit.id, "score": hit.score} if hit else None
-        if hit is None:
-            # TODO(WP3) : en cas de doute, l'appel LLM du tour choisira parmi les 3 meilleures fiches
+        """Fiche lue mot pour mot. Zone « direct » : 0 appel LLM. Zone grise : l'appel LLM du
+        tour choisit parmi les meilleures fiches, ou aucune ; on lit alors la fiche choisie,
+        jamais un texte rédigé par le LLM."""
+        if self.retriever is None:
             return self._unrecognised(trace)
-        reply = hit.answer
+        d = self.retriever.decide(text)
+        trace["knowledge"] = {"zone": d.zone, "hits": [(h.id, h.score) for h in d.hits]}
+        fiche = d.best if d.zone == "direct" else None
+        if d.zone == "grey" and self.gateway is not None:
+            ctx = TurnContext(text=text, intent=self.state.intent or self.router.route(text).intent,
+                              rules_reply=self.pack.persona.fallback_message, needs_llm=True,
+                              knowledge=[{"id": h.id, "question": h.question, "reponse": h.answer} for h in d.hits],
+                              knowledge_ids=[h.id for h in d.hits], history=self.state.history[:-1])
+            decision = self.policy.decide(ctx)
+            trace["agent"] = {"llm_used": decision.llm_used, "fallback": decision.fallback,
+                              "knowledge_id": decision.knowledge_id}
+            if decision.escalate:
+                return self._escalate(Escalation("agent_requested", decision.escalate_reason), trace)
+            fiche = next((h for h in d.hits if h.id == decision.knowledge_id), None)
+        if fiche is None:
+            return self._unrecognised(trace)
+        reply = fiche.answer
         if self.state.run and (slot := self.workflows.next_missing(self.state.run)):
             reply += " " + slot.prompt                          # on revient au workflow en cours
         return self._result(reply, trace)

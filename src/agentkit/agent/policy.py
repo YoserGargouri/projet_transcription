@@ -38,7 +38,8 @@ class TurnContext:
     candidates: list[str] = field(default_factory=list)       # item_code autorisés ce tour
     candidate_details: list[dict] = field(default_factory=list)
     clarification: str | None = None
-    knowledge: list[dict] = field(default_factory=list)
+    knowledge: list[dict] = field(default_factory=list)       # fiches proposées (zone grise)
+    knowledge_ids: list[str] = field(default_factory=list)    # knowledge_id autorisés ce tour
     history: list[dict] = field(default_factory=list)
     signals: dict[str, float] = field(default_factory=dict)
 
@@ -49,6 +50,7 @@ class AgentDecision:
     reply: str
     slots: dict[str, Any] = field(default_factory=dict)
     item_code: str | None = None
+    knowledge_id: str | None = None
     tool_call: dict | None = None
     sentiment: str = "neutre"
     escalate: bool = False
@@ -98,13 +100,14 @@ class SingleCallPolicy(AgentPolicy):
     def decide(self, ctx: TurnContext) -> AgentDecision:
         if not ctx.needs_llm:
             return self.rules.decide(ctx)                       # D1 : 0 appel quand les règles suffisent
-        modele = build_agent_output_model([i.id for i in self.pack.intents], ctx.slot_names, ctx.candidates)
+        modele = build_agent_output_model([i.id for i in self.pack.intents], ctx.slot_names, ctx.candidates,
+                                          knowledge_ids=ctx.knowledge_ids)
         try:
             sortie = self.gateway.complete_json(self.messages(ctx), modele)
         except InvalidOutput as e:
-            # D3 : jamais de code hors candidats. Si le reste est valide, item_code -> null.
+            # D3 : jamais de code hors candidats. Si le reste est valide, item_code (et la fiche) -> null.
             if e.raw is not None:
-                brut = {**e.raw, "item_code": None}
+                brut = {**e.raw, "item_code": None, "knowledge_id": None}
                 try:
                     sortie = modele.model_validate(brut)
                     d = self._decision(sortie)
@@ -121,5 +124,6 @@ class SingleCallPolicy(AgentPolicy):
     def _decision(sortie) -> AgentDecision:
         return AgentDecision(
             intent=sortie.intent, reply=sortie.reply, slots=sortie.slots.model_dump(), item_code=sortie.item_code,
+            knowledge_id=sortie.knowledge_id,
             tool_call=sortie.tool_call.model_dump() if sortie.tool_call else None, sentiment=sortie.sentiment,
             escalate=sortie.escalate.needed, escalate_reason=sortie.escalate.reason, llm_used=True)

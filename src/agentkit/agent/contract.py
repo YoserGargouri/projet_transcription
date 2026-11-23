@@ -5,6 +5,7 @@ Le modèle pydantic est construit à CHAQUE tour :
     intent    ∈ intentions du pack
     slots     ∈ slots du workflow en cours (sauf l'élément du catalogue)
     item_code ∈ candidats de CE tour, ou null — jamais un code hors candidats
+    knowledge_id ∈ fiches proposées ce tour (zone grise de la FAQ), ou null
     tool_call ∈ outils enregistrés, ou null
     reply, sentiment, escalate {needed, reason}
 
@@ -31,7 +32,8 @@ def _litteral(valeurs):
 
 
 def build_agent_output_model(intents: list[str], slot_names: list[str], candidates: list[str],
-                             tools: dict[str, list[str]] | None = None) -> type[BaseModel]:
+                             tools: dict[str, list[str]] | None = None,
+                             knowledge_ids: list[str] | None = None) -> type[BaseModel]:
     """tools : nom d'outil -> actions autorisées (vide = pas d'appel d'outil par le LLM)."""
     stricte = ConfigDict(extra="forbid")
     Slots = create_model("Slots", __config__=stricte, **{n: (str | None, None) for n in slot_names})
@@ -48,6 +50,7 @@ def build_agent_output_model(intents: list[str], slot_names: list[str], candidat
         intent=(_litteral(intents), ...),
         slots=(Slots, Field(default_factory=Slots)),
         item_code=(type_item, None),
+        knowledge_id=((_litteral(knowledge_ids) | None) if knowledge_ids else type(None), None),
         tool_call=(type_outil, None),
         reply=(str, Field(min_length=1)),
         sentiment=(_litteral(SENTIMENTS), "neutre"),

@@ -183,8 +183,18 @@ class KnowledgeSpec(Strict):
     answer_column: str = "reponse"
     variants_column: str | None = None
     variants_separator: str = "|"
-    retriever: Literal["tfidf"] = "tfidf"
-    min_score: float = Field(0.35, ge=0, le=1)
+    retriever: Literal["tfidf", "embeddings", "hybrid"] = Field(
+        "tfidf", description="tfidf (lexical) | embeddings (sens) | hybrid (les deux, pondérés)")
+    embeddings_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    lexical_weight: float = Field(0.3, ge=0, le=1, description="Part du score lexical (retriever hybrid)")
+    min_score: float = Field(0.35, ge=0, le=1, description="Score minimal pour lire une fiche directement (0 appel LLM)")
+    min_gap: float = Field(0.0, ge=0, le=1,
+                           description="Écart minimal entre la 1re et la 2e fiche pour une lecture directe : "
+                                       "deux fiches voisines presque à égalité = ambiguïté -> zone grise")
+    llm_margin: float = Field(0.1, ge=0, le=1,
+                              description="Zone grise [min_score - llm_margin, min_score[ : l'appel LLM du tour "
+                                          "choisit parmi les llm_top_k meilleures fiches, ou aucune")
+    llm_top_k: int = Field(3, ge=1, le=10)
 
 
 # --- Workflows ------------------------------------------------------------------------------
@@ -323,6 +333,34 @@ class LoggingSpec(Strict):
     _v = field_validator("extra_patterns")(_regex_valides)
 
 
+# --- Jeux d'évaluation déclarés par le pack (les scripts d'évaluation restent génériques) -----
+class IntentDatasetSpec(Strict):
+    """Phrases annotées pour évaluer le routage du premier tour (intention ou groupe)."""
+
+    id: str
+    file: str
+    text_column: str
+    label_column: str = Field(description="Valeurs attendues : group (ou id) des intentions")
+    split_column: str | None = None
+    out_of_scope_column: str | None = Field(None, description="1 = doit partir vers un humain (périmètre interdit)")
+    escalate_label: str = Field(description="Étiquette à prédire quand le système transfère dès le premier tour")
+
+
+class KnowledgeDatasetSpec(Strict):
+    """Reformulations de questions pour évaluer la recherche dans la base de connaissances."""
+
+    id: str
+    file: str
+    text_column: str = "question"
+    expected_column: str = Field("attendu", description="id de la fiche attendue ; vide = aucune fiche ne convient")
+    blind: bool = Field(False, description="Écrit par quelqu'un qui n'a pas vu la FAQ (sinon : jeu de mise au point)")
+
+
+class EvaluationSpec(Strict):
+    intents: list[IntentDatasetSpec] = Field(default_factory=list)
+    knowledge: list[KnowledgeDatasetSpec] = Field(default_factory=list)
+
+
 # --- Le pack ----------------------------------------------------------------------------------
 class DomainPack(Strict):
     schema_version: Literal[1] = SCHEMA_VERSION
@@ -345,6 +383,7 @@ class DomainPack(Strict):
     channels: ChannelsSpec = Field(default_factory=ChannelsSpec)
     llm: LLMSpec
     logging: LoggingSpec = Field(default_factory=LoggingSpec)
+    evaluation: EvaluationSpec = Field(default_factory=EvaluationSpec)
 
     _root: Path | None = PrivateAttr(default=None)
 
@@ -401,6 +440,11 @@ class DomainPack(Strict):
             inconnus = set(s.applies_if) - attributs
             if inconnus:
                 raise ValueError(f"script {s.id} : attributs inconnus {inconnus}")
+        groupes = {i.group or i.id for i in self.intents}
+        for d in self.evaluation.intents:
+            if d.escalate_label not in groupes:
+                raise ValueError(f"évaluation {d.id} : escalate_label {d.escalate_label!r} n'est ni un groupe "
+                                 f"ni une intention ({sorted(groupes)})")
         signaux = {s.id for s in self.signals}
         inconnus = set(self.escalation.signal_thresholds) - signaux
         if inconnus:
