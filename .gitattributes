@@ -1,0 +1,5 @@
+# Fichiers lus sous Linux (dans le conteneur) : fins de ligne Unix, quel que soit le système
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+docker-compose.yml text eol=lf
+*.sh text eol=lf
