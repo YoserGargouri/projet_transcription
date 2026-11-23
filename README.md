@@ -48,6 +48,30 @@ Clés (`.env`, jamais versionné) :
   `LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai`, `LLM_API_KEY`,
   `LLM_MODEL`. Sans LLM, l'agent fonctionne avec les règles seules.
 
+## Docker (sans rien installer d'autre que Docker)
+
+Une seule image contient le moteur, l'API et l'application web. Il faut Docker Desktop
+(Compose ≥ 2.24).
+
+```
+copy .env.example .env                   # puis y mettre ses propres clés (LLM, ElevenLabs)
+docker compose up --build                # http://localhost:8000
+```
+
+- **Clés** : lues dans `.env` au lancement, jamais copiées dans l'image (`.dockerignore`). Sans
+  `.env`, l'agent fonctionne avec les règles seules. Chacun utilise ses propres clés.
+- **Données** : comptes, conversations, agendas, audios et modèles téléchargés sont dans le volume
+  `agentkit-data` (conservés entre deux lancements ; `docker compose down -v` les efface).
+- **Modèles** : Whisper (~0,5 Go) et le modèle d'embeddings (~0,5 Go) se téléchargent au premier
+  usage, une seule fois. Pour les inclure dans l'image : `docker compose build --build-arg PRELOAD_MODELS=1`.
+- **Partager l'image sans dépôt** : `docker save agentkit-platform:latest -o agentkit.tar`, puis chez
+  le collègue `docker load -i agentkit.tar` et `docker compose up` (sans `--build`).
+- **Outils en ligne de commande** dans le conteneur, par exemple :
+  `docker compose run --rm platform python -m pytest -q` ou
+  `docker compose run --rm platform python -m agentkit.evaluation.eval_conversations --mode texte`.
+  Le micro de la machine n'est pas accessible depuis Docker : la voix passe par le navigateur
+  (Playground), les modes `--micro` restent à lancer hors conteneur.
+
 ## Plateforme web
 
 Site public (présentation, solutions, démo) et application connectée : tableau de bord,

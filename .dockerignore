@@ -1,0 +1,35 @@
+# Contexte de construction : seulement ce qui sert à l'image.
+
+# Secrets : JAMAIS dans l'image (fournis au lancement via .env)
+.env
+.env.*
+!.env.example
+
+# Environnements, dépendances et sorties de construction locales
+.git
+venv/
+.venv/
+**/node_modules
+web/dist
+**/*.tsbuildinfo
+**/__pycache__
+**/*.pyc
+.pytest_cache/
+.cache/
+.claude/
+
+# Données d'exécution et résultats (recréés dans le volume /data)
+runtime/
+results/
+logs/
+models/
+
+# Données non versionnées des packs (audios bruts, sources)
+domains/*/data/audio/*
+!domains/*/data/audio/test_samples/
+domains/*/data/raw/
+domains/*/data/tmp/
+domains/*/data/results/
+
+# Documents
+docs/*.pdf
