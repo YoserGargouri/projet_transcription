@@ -54,7 +54,9 @@ def transcrire(chemin: Path, nom_modele: str, langue: str | None):
 
     duree = sf.info(chemin).duration
     t0 = time.perf_counter()
-    segments, _ = modele.transcribe(str(chemin), language=langue, beam_size=5, word_timestamps=True)
+    from agentkit.channels.audio.stt import charger_16k
+
+    segments, _ = modele.transcribe(charger_16k(chemin), language=langue, beam_size=5, word_timestamps=True)
     segments = list(segments)  # la transcription se fait réellement ici
     latence = time.perf_counter() - t0
 

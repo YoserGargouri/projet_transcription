@@ -20,6 +20,19 @@ import soundfile as sf
 from agentkit import config
 
 
+def charger_16k(chemin) -> np.ndarray:
+    """Audio en float32 mono 16 kHz. On décode nous-mêmes (soundfile) au lieu de laisser
+    faster-whisper passer par PyAV, dont l'API a changé (av 15+ : argument metadata_errors)."""
+    y, sr = sf.read(str(chemin), dtype="float32")
+    if y.ndim > 1:
+        y = y.mean(axis=1)
+    if sr != 16000:
+        import librosa
+
+        y = librosa.resample(y, orig_sr=sr, target_sr=16000)
+    return y.astype(np.float32)
+
+
 class Whisper:
     """faster-whisper, exécuté sur le processeur. Modèle téléchargé au premier usage."""
 
@@ -32,7 +45,7 @@ class Whisper:
 
     def transcrire(self, chemin) -> dict:
         t0 = time.perf_counter()
-        segments, _ = self.modele.transcribe(str(chemin), language=self.langue, beam_size=5,
+        segments, _ = self.modele.transcribe(charger_16k(chemin), language=self.langue, beam_size=5,
                                              word_timestamps=True)
         segments = list(segments)  # la transcription a réellement lieu ici
         latence = time.perf_counter() - t0
