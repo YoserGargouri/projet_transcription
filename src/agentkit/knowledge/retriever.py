@@ -15,6 +15,7 @@ on se replie sur tfidf avec un avertissement : la conversation continue.
 from __future__ import annotations
 
 import logging
+import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -116,6 +117,12 @@ class TfidfRetriever(_BaseFiches):
         return (self._index @ self._vect.transform([normalise(query)]).T).toarray().ravel()
 
 
+def _leger(t: str) -> str:
+    """Normalisation légère pour les embeddings : minuscules, sans ponctuation, MAIS avec les
+    accents (utiles au modèle). Sans elle, un simple « ? » déplaçait le score d'une fiche."""
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s'’-]", " ", t.lower())).strip()
+
+
 class EmbeddingRetriever(_BaseFiches):
     def __init__(self, pack, spec=None, encoder=None):
         super().__init__(pack, spec)
@@ -126,8 +133,8 @@ class EmbeddingRetriever(_BaseFiches):
 
     def _scores_textes(self, query):
         if self._vecteurs is None:
-            self._vecteurs = self.encoder.encode(self.textes)
-        return self._vecteurs @ self.encoder.encode([query])[0]
+            self._vecteurs = self.encoder.encode([_leger(t) for t in self.textes])
+        return self._vecteurs @ self.encoder.encode([_leger(query)])[0]
 
 
 class HybridRetriever(Retriever):

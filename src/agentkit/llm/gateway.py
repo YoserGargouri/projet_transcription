@@ -145,7 +145,9 @@ def gateway_from_env(use_cache: bool = True) -> LLMGateway | None:
     from agentkit.llm.providers.openai_compatible import OpenAICompatibleProvider
 
     fournisseur = OpenAICompatibleProvider(base_url, config.env("LLM_API_KEY"), modele,
-                                           json_mode=config.env("LLM_JSON_MODE", "json_schema"))
+                                           json_mode=config.env("LLM_JSON_MODE", "json_schema"),
+                                           timeout_s=float(config.env("LLM_TIMEOUT_S", "10") or 10),
+                                           reasoning_effort=config.env("LLM_REASONING_EFFORT"))
     cache = ResponseCache(config.runtime_dir("cache") / "llm.sqlite") if use_cache else None
     return LLMGateway(fournisseur, cache, max_calls=config.env_int("LLM_MAX_CALLS"),
                       max_tokens=config.env_int("LLM_MAX_TOKENS"))

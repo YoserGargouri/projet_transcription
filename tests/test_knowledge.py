@@ -78,3 +78,13 @@ def test_zone_grise_fiche_hors_liste_refusee():
     o, _ = _orch_zone_grise({**BASE, "knowledge_id": "F99"})
     r = o.handle_text("Vous êtes ouverts le samedi ?")
     assert r.reply == o.pack.persona.fallback_message and r.trace["agent"]["knowledge_id"] is None
+
+
+def test_faq_essayee_quand_aucune_regle_ne_reconnait_la_question():
+    """« caution » n'est pas un motif du routeur, mais la FAQ a la réponse : pas de « reformulez »."""
+    from agentkit.nlu.router import RouteResult
+
+    o = Orchestrator(load_domain("demo_minimal"))
+    o.router.route = lambda texte: RouteResult(intent="autre")                 # aucune règle ne reconnaît
+    r = o.handle_text("il faut laisser une caution ?")
+    assert "200 euros" in r.reply

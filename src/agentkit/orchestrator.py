@@ -141,6 +141,8 @@ class Orchestrator:
         if handler == "escalate":                               # 7. selon l'intention
             if route.matched:
                 return self._escalate(Escalation("intent_escalate", intent), trace)
+            if self.retriever is not None:                      # aucune règle : la FAQ a peut-être la réponse
+                return self._knowledge(text, trace)
             return self._unrecognised(trace)
         if handler == "knowledge":
             return self._knowledge(text, trace)

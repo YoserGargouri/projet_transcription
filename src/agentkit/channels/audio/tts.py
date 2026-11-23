@@ -88,11 +88,14 @@ class ElevenLabsTTS(TTSEngine):
         return self._client
 
     def _voix(self) -> str:
-        if not self.voice_id:  # pas de voix choisie : la première voix du compte
-            voix = self.client.voices.search(page_size=1).voices
-            if not voix:
+        if not self.voice_id:
+            # Pas de voix choisie : la première voix « premade » du compte. Les voix de la
+            # bibliothèque (professional, ...) sont refusées par l'API sur l'offre gratuite (402).
+            voix = self.client.voices.search(page_size=100).voices
+            premade = [v for v in voix if getattr(v, "category", "") == "premade"]
+            if not (premade or voix):
                 raise RuntimeError("aucune voix sur le compte ElevenLabs")
-            self.voice_id = voix[0].voice_id
+            self.voice_id = (premade or voix)[0].voice_id
         return self.voice_id
 
     def cache_identity(self) -> dict:
@@ -197,7 +200,7 @@ class TTSService:
             cache = self.cache_dir / f"{engine.name}_{self._cle(engine, text)}.wav"
             if cache.exists():
                 shutil.copy(cache, out_path)
-                return self._resultat(out_path, engine, cached=True, chars=0, latence=0.0)
+                return self._resultat(out_path, engine, cached=True, chars=0, latence=0.0, erreurs=erreurs)
             t0 = time.perf_counter()
             try:
                 y, sr = engine.synthesize(text)

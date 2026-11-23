@@ -28,11 +28,14 @@ class FauxClientElevenLabs:
         yield (0.3 * np.sin(2 * np.pi * 220 * t) * 32767).astype("<i2").tobytes()
 
     def search(self, **kw):
-        class V:
-            voice_id = "voix-par-defaut"
+        class Bibliotheque:
+            voice_id, category = "voix-bibliotheque", "professional"
+
+        class Premade:
+            voice_id, category = "voix-par-defaut", "premade"
 
         class R:
-            voices = [V()]
+            voices = [Bibliotheque(), Premade()]   # la 1re voix serait refusée (offre gratuite)
         return R()
 
 
