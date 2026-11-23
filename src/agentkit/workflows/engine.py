@@ -109,6 +109,8 @@ class WorkflowEngine:
             spec = par_nom[nom]
             if spec.type in ("date", "time", "datetime"):
                 v = dates.normaliser(str(v), spec.type, self.pack.language) or v
+            if spec.type == "reference":                       # dictée lettre par lettre : « R D V 1 2 »
+                v = re.sub(r"\s+", "", str(v)).upper()
             if err := valider(spec, v):
                 erreurs[nom] = err
             else:
