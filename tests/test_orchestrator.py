@@ -24,7 +24,9 @@ def test_un_tour_avec_fake_llm(demo):
     o.start()
     r = o.handle_text("Je voudrais louer un VTT grand pour samedi, au nom d'Alice Martin")
     assert r.llm_calls == 1 and r.item_id == "V_VTT_L"
-    assert r.reply.startswith("Je réserve : VTT taille L, samedi, au nom de Alice Martin")
+    # « samedi » est enregistré comme une vraie date (ISO) et relu en toutes lettres
+    assert r.reply.startswith("Je réserve : VTT taille L, samedi ") and "au nom de Alice Martin" in r.reply
+    assert o.state.run.slots["date"].count("-") == 2
     # le LLM n'a vu que les candidats autorisés, et le contexte du tour
     assert "V_VTT_L" in fake.calls[0][-1]["content"]
     r = o.handle_text("oui")                           # confirmation : règles seules (D1)

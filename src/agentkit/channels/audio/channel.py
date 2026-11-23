@@ -13,6 +13,7 @@ d'agir. TODO(WP7) : démonstrateur Gradio (micro + lecteur) au-dessus de ce cana
 """
 from __future__ import annotations
 
+import logging
 import tempfile
 import time
 from dataclasses import dataclass, field
@@ -24,6 +25,8 @@ from agentkit.channels.audio.quality import decision, diagnostic, pretraiter
 from agentkit.channels.audio.stt import creer_moteur
 from agentkit.channels.audio.tts import TTSService
 from agentkit.orchestrator import Orchestrator, TurnResult
+
+log = logging.getLogger("agentkit.audio")
 
 
 @dataclass
@@ -48,7 +51,7 @@ class AudioChannel:
         if audio is None:
             raise ValueError(f"le pack {orchestrator.pack.id} ne déclare pas de canal audio")
         self.spec = audio
-        self.stt = stt or creer_moteur(audio.stt.engine, langue=orchestrator.pack.language)
+        self.stt = stt or creer_moteur(audio.stt.engine, langue=orchestrator.pack.language, prompt=audio.stt.prompt)
         self.tts = tts or TTSService.from_pack(orchestrator.pack)
 
     @classmethod
@@ -70,6 +73,8 @@ class AudioChannel:
             texte, confiance = r["texte"], r["confiance"]
         t_nlu = time.perf_counter()
         choix = decision(diag, self.spec.quality, confiance, texte)
+        log.info("STT %s : %.2f s, confiance %.2f, %d mots, décision qualité « %s »", getattr(self.stt, "nom", "?"),
+                 t_nlu - t_stt, confiance, len(texte.split()), choix)
         if choix == "redemander":
             tour = self.orch.handle_unusable_input(self.spec.retry_message)
         else:
@@ -78,6 +83,8 @@ class AudioChannel:
         t_tts = time.perf_counter()
         sortie = self.tts.synthesize(tour.reply, reply_path)
         fin = time.perf_counter()
+        log.info("TTS %s : %d car.%s, %.2f s ; tour complet %.2f s", sortie["engine"], len(tour.reply),
+                 " (cache)" if sortie["cached"] else "", fin - t_tts, fin - t0)
         return AudioTurnResult(
             transcript=texte, stt_confidence=confiance, quality=diag, quality_decision=choix, turn=tour,
             reply_audio=sortie["file"],

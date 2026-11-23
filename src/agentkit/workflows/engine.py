@@ -11,8 +11,12 @@ appel d'outil final (on_complete) dont les arguments sont des modèles de texte 
     engine.confirmation_text(run)
     result, message = engine.complete(run)            # appelle l'outil, rend success_message
 
-TODO(WP6) : interprétation des dates et heures (aujourd'hui texte libre), proposition de
-créneaux libres par l'outil avant la confirmation, annulation / retour en arrière.
+Dates : les slots date / time / datetime sont stockés en ISO (le LLM convertit « demain à
+10 h » ; sans LLM, agentkit.nlu.dates analyse les formes courantes) et lus à voix haute dans
+les messages (« jeudi 26 novembre à 10 heures »).
+Avant le récapitulatif, precheck() demande à l'outil si l'action est possible (créneau libre,
+référence existante...) : sinon le slot fautif est vidé et l'outil propose des alternatives.
+TODO(WP6) : annulation / retour en arrière.
 """
 from __future__ import annotations
 
@@ -21,6 +25,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from agentkit.domain.schema import DomainPack, SlotSpec, WorkflowSpec
+from agentkit.nlu import dates
 from agentkit.tools.base import ToolError
 from agentkit.tools.registry import ToolRegistry
 
@@ -41,9 +46,14 @@ class _Acces(dict):
         return self.get(k, "")
 
 
-def render(template: str, run: WorkflowRun, result: dict | None = None) -> str:
-    return template.format(slots=_Acces({k: v for k, v in run.slots.items() if v is not None}),
-                           item=_Acces(run.item or {}), result=_Acces(result or run.result or {}))
+def render(template: str, run: WorkflowRun, result: dict | None = None, langue: str | None = None) -> str:
+    """langue renseignée : texte destiné à l'utilisateur (dates ISO dites en toutes lettres) ;
+    None : arguments d'outil (valeurs brutes)."""
+    dire = (lambda v: dates.dire(v, langue)) if langue else (lambda v: v)
+    return template.format(slots=_Acces({k: dire(v) for k, v in run.slots.items() if v is not None}),
+                           item=_Acces(run.item or {}),
+                           result=_Acces({k: dire(v) if isinstance(v, str) else v
+                                          for k, v in (result or run.result or {}).items()}))
 
 
 def valider(slot: SlotSpec, valeur: Any) -> str | None:
@@ -59,6 +69,9 @@ def valider(slot: SlotSpec, valeur: Any) -> str | None:
         return "nombre attendu"
     if slot.type == "choice" and slot.choices and v not in slot.choices:
         return f"valeur attendue parmi {slot.choices}"
+    if slot.type in ("date", "time", "datetime") and not dates.normaliser(v, slot.type):
+        return {"date": "date attendue (AAAA-MM-JJ)", "time": "heure attendue (HH:MM)",
+                "datetime": "date et heure attendues (AAAA-MM-JJTHH:MM)"}[slot.type]
     if slot.type == "reference" and not re.fullmatch(r"[\w-]{3,}", v):
         return "référence invalide"
     if slot.pattern and not re.fullmatch(slot.pattern, v):
@@ -93,18 +106,42 @@ class WorkflowEngine:
         for nom, v in valeurs.items():
             if v is None or nom not in par_nom or par_nom[nom].type == "catalogue_item":
                 continue
-            if err := valider(par_nom[nom], v):
+            spec = par_nom[nom]
+            if spec.type in ("date", "time", "datetime"):
+                v = dates.normaliser(str(v), spec.type, self.pack.language) or v
+            if err := valider(spec, v):
                 erreurs[nom] = err
             else:
                 run.slots[nom] = str(v).strip()
         return erreurs
 
+    def missing(self, run: WorkflowRun) -> list[SlotSpec]:
+        return [s for s in self.spec(run).slots if s.required and not run.slots.get(s.name)]
+
     def next_missing(self, run: WorkflowRun) -> SlotSpec | None:
-        return next((s for s in self.spec(run).slots if s.required and not run.slots.get(s.name)), None)
+        return next(iter(self.missing(run)), None)
 
     def confirmation_text(self, run: WorkflowRun) -> str | None:
         spec = self.spec(run)
-        return render(spec.confirmation, run) if spec.confirmation else None
+        return render(spec.confirmation, run, langue=self.pack.language) if spec.confirmation else None
+
+    def precheck(self, run: WorkflowRun) -> dict | None:
+        """Demande à l'outil final si l'action est possible, AVANT le récapitulatif.
+        None si oui (ou si l'outil ne sait pas vérifier) ; sinon {"slot", "reason", "options"} :
+        le slot fautif est vidé pour être redemandé, options = propositions de l'outil (ISO)."""
+        spec = self.spec(run)
+        if not spec.on_complete:
+            return None
+        args = {k: render(v, run) for k, v in spec.on_complete.arguments.items()}
+        pb = self.tools.check(spec.on_complete.tool, spec.on_complete.action, args)
+        if pb is None:
+            return None
+        modele = spec.on_complete.arguments.get(pb.get("argument") or "", "")
+        m = re.search(r"\{slots\.(\w+)\}", modele)
+        slot = m.group(1) if m else None
+        if slot:
+            run.slots.pop(slot, None)
+        return {"slot": slot, "reason": pb.get("reason", ""), "options": pb.get("options", [])}
 
     def complete(self, run: WorkflowRun) -> tuple[dict[str, Any], str]:
         spec = self.spec(run)
@@ -117,4 +154,4 @@ class WorkflowEngine:
                 run.status = "failed"
                 raise
         run.result, run.status = resultat, "done"
-        return resultat, render(spec.success_message, run, resultat) if spec.success_message else ""
+        return resultat, render(spec.success_message, run, resultat, self.pack.language) if spec.success_message else ""

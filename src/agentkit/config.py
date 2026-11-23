@@ -44,3 +44,32 @@ def runtime_dir(*parties: str) -> Path:
 
 def domaine_par_defaut() -> str:
     return env("DOMAIN", "imagerie_medicale")
+
+
+def configurer_journal(verbose: bool) -> None:
+    """--verbose : affiche les étapes du traitement (STT, appel LLM, repli, TTS...) via le module
+    logging. Ces messages ne contiennent ni le texte de l'utilisateur ni les clés d'API."""
+    import logging
+
+    logging.basicConfig(level=logging.WARNING, format="        · %(name)s : %(message)s")
+    logging.getLogger("agentkit").setLevel(logging.INFO if verbose else logging.WARNING)
+
+
+def resume_agent(trace: dict) -> str:
+    """Une ligne lisible : le LLM a-t-il été utilisé pour ce tour, et pour quoi."""
+    a = trace.get("agent")
+    if trace.get("llm_failure"):
+        return f"LLM : échec -> règles ({trace['llm_failure'][:90]})"
+    if not a:
+        return "LLM : non appelé (règles : " + ", ".join(k for k in ("safety", "confirmation", "escalation",
+                                                                     "precheck") if k in trace) + ")"
+    if not a.get("llm_used"):
+        return f"LLM : échec -> règles ({a.get('fallback', '')[:80]})"
+    infos = [f"intention {a.get('intent')}"] if a.get("intent") else []
+    if (k := trace.get("knowledge", {})).get("used"):
+        infos.append(f"sources {k['used']}")
+    if a.get("slots"):
+        infos.append(f"infos {a['slots']}")
+    if a.get("asks_for"):
+        infos.append(f"demande {a['asks_for']}")
+    return "LLM : utilisé (" + ", ".join(infos) + ")"

@@ -7,6 +7,7 @@ Le modèle pydantic est construit à CHAQUE tour :
     item_code ∈ candidats de CE tour, ou null — jamais un code hors candidats
     knowledge_id ∈ fiches proposées ce tour (zone grise de la FAQ), ou null
     tool_call ∈ outils enregistrés, ou null
+    (mode llm_first : understood, sources ⊆ fiches fournies, asks_for ∈ slots ; voir plus bas)
     reply, sentiment, escalate {needed, reason}
 
 On ne compte pas sur le fournisseur pour respecter l'énumération : la passerelle valide avec
@@ -33,9 +34,20 @@ def _litteral(valeurs):
 
 def build_agent_output_model(intents: list[str], slot_names: list[str], candidates: list[str],
                              tools: dict[str, list[str]] | None = None,
-                             knowledge_ids: list[str] | None = None) -> type[BaseModel]:
-    """tools : nom d'outil -> actions autorisées (vide = pas d'appel d'outil par le LLM)."""
+                             knowledge_ids: list[str] | None = None, *, conversational: bool = False,
+                             askable_slots: list[str] | None = None) -> type[BaseModel]:
+    """tools : nom d'outil -> actions autorisées (vide = pas d'appel d'outil par le LLM).
+
+    conversational (mode llm_first) : le LLM comprend tout le tour. Au lieu de knowledge_id
+    (choix d'UNE fiche lue mot pour mot), il renvoie :
+        understood  false s'il n'a pas compris la demande (compte pour le transfert)
+        sources     fiches de la base sur lesquelles s'appuie sa réponse (∈ fiches fournies)
+        asks_for    l'information que sa réponse demande (∈ slots), pour que le système
+                    sache à quoi correspondra la réponse suivante
+    """
     stricte = ConfigDict(extra="forbid")
+    if conversational:
+        return _modele_conversationnel(intents, slot_names, candidates, knowledge_ids or [], askable_slots or [])
     Slots = create_model("Slots", __config__=stricte, **{n: (str | None, None) for n in slot_names})
     type_item = (_litteral(candidates) | None) if candidates else type(None)
     if tools:
@@ -56,3 +68,21 @@ def build_agent_output_model(intents: list[str], slot_names: list[str], candidat
         sentiment=(_litteral(SENTIMENTS), "neutre"),
         escalate=(EscalateFlag, Field(default_factory=EscalateFlag)),
     )
+
+
+def _modele_conversationnel(intents, slot_names, candidates, knowledge_ids, askable_slots):
+    stricte = ConfigDict(extra="forbid")
+    Slots = create_model("Slots", __config__=stricte, **{n: (str | None, None) for n in slot_names})
+    champs: dict[str, Any] = {
+        "intent": (_litteral(intents), ...),
+        "understood": (bool, True),
+        "slots": (Slots, Field(default_factory=Slots)),
+        "item_code": ((_litteral(candidates) | None) if candidates else type(None), None),
+    }
+    if knowledge_ids:
+        champs["sources"] = (list[_litteral(knowledge_ids)], Field(default_factory=list))
+    champs["asks_for"] = ((_litteral(askable_slots) | None) if askable_slots else type(None), None)
+    champs["reply"] = (str, Field(min_length=1))
+    champs["sentiment"] = (_litteral(SENTIMENTS), "neutre")
+    champs["escalate"] = (EscalateFlag, Field(default_factory=EscalateFlag))
+    return create_model("AgentOutput", __config__=stricte, **champs)

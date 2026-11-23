@@ -21,6 +21,8 @@ persona:
   goodbye_message: Merci de votre appel, au revoir.
   not_found_message: Cet examen ne figure pas dans notre catalogue.
   change_prompt: D'accord. Que souhaitez-vous corriger ?
+  no_answer_message: Je n'ai pas cette information. Souhaitez-vous que je vous passe le secrétariat ?
+  unavailable_message: Ce créneau n'est pas possible. Je peux vous proposer {options}. Lequel vous convient ?
 
 scope:
   description: prendre, déplacer, annuler ou consulter un rendez-vous d'imagerie, et donner des informations pratiques non médicales.
@@ -242,6 +244,12 @@ knowledge:
   min_gap: 0.13
   llm_margin: 0.15
   llm_top_k: 3
+  # Mode llm_first : le LLM rédige la réponse à partir des fiches (sources citées et vérifiées).
+  # 24 fiches : on les donne toutes (≈ 1 500 jetons), aucune ne peut être ratée par la recherche.
+  # Les réglages min_score / min_gap ci-dessus restent utilisés par le repli sans LLM et par
+  # l'évaluation de la recherche (eval_knowledge).
+  answer_mode: grounded
+  llm_context: all
 
 workflows:
   - workflows/booking.yaml
@@ -320,7 +328,10 @@ answers:
 
 channels:
   audio:
-    stt: {engine: whisper-small}
+    stt:
+      engine: whisper-small
+      # Vocabulaire du centre donné à Whisper (« rendez-vous » n'est plus entendu « en haut niveau »)
+      prompt: "Centre d'imagerie médicale. Prendre, déplacer ou annuler un rendez-vous. IRM, scanner, échographie, radiographie, mammographie, ordonnance, injection, référence RDV."
     tts:
       engine: elevenlabs
       voice_id: ${ELEVENLABS_VOICE_ID}
@@ -333,6 +344,9 @@ channels:
 llm:
   system_prompt: prompts/agent_system.md
   max_history_turns: 6
+  # Le LLM comprend chaque tour ; les règles (intents.patterns) deviennent un indice et le repli
+  # quand le LLM est indisponible. Le routeur par règles reste évalué seul (eval_router).
+  mode: llm_first
 
 logging:
   # Numéro de sécurité sociale (masqué en plus des motifs génériques)

@@ -113,11 +113,78 @@ class CalendarTool(Tool):
         return n == 0
 
     def _ligne(self, reference: str) -> dict:
-        r = self.db.execute("SELECT * FROM bookings WHERE reference = ?", (reference.strip().upper(),)).fetchone()
+        # « rdv a b 12 » dicté au téléphone = « RDV-AB12 » : on compare sans espaces ni tirets
+        cle = "".join(c for c in reference.upper() if c.isalnum())
+        r = self.db.execute("SELECT * FROM bookings WHERE REPLACE(reference, '-', '') = ?", (cle,)).fetchone()
         if r is None:
             raise ToolError(f"référence introuvable : {reference}")
         cols = ["reference", "resource", "start", "end", "item_id", "contact", "status"]
         return dict(zip(cols, r))
+
+    def _propositions(self, ressource: str, duree: timedelta, apres: datetime, sauf: str = "",
+                      n: int = 3, espacement_min: int = 120) -> list[str]:
+        """n créneaux libres espacés (pas 9 h 00, 9 h 10, 9 h 20 : des choix réellement différents)."""
+        pas = timedelta(minutes=self.cfg.slot_step_min)
+        t = max(apres, datetime.now()).replace(second=0, microsecond=0)
+        t += timedelta(minutes=-t.minute % self.cfg.slot_step_min)
+        fin, choix = t + timedelta(days=self.cfg.horizon_days), []
+        while t < fin and len(choix) < n:
+            if self._dans_horaires(t, t + duree) and self._libre(ressource, t, t + duree, sauf):
+                choix.append(t)
+                t += timedelta(minutes=espacement_min)
+                continue
+            t += pas
+        return [c.isoformat(timespec="minutes") for c in choix]
+
+    def _probleme(self, ressource: str, debut: datetime, duree: timedelta, sauf: str = "") -> str | None:
+        if debut < datetime.now():
+            return "ce moment est déjà passé"
+        if not self._dans_horaires(debut, debut + duree):
+            return "c'est en dehors des horaires d'ouverture"
+        if not self._libre(ressource, debut, debut + duree, sauf):
+            return "ce créneau est déjà pris"
+        return None
+
+    # ------------------------------------------------------------------ vérifications -----
+    # Appelées avant le récapitulatif (Tool.check) : rien n'est écrit.
+    def check_book(self, p: Book) -> dict | None:
+        if self.resources and p.resource not in self.resources:
+            return {"argument": "resource", "reason": f"ressource inconnue : {p.resource}", "options": []}
+        duree = timedelta(minutes=self._duree(p.duration_min, p.item_id))
+        if raison := self._probleme(p.resource, p.start, duree):
+            jour = p.start.replace(hour=0, minute=0, second=0, microsecond=0)
+            return {"argument": "start", "reason": raison, "options": self._propositions(p.resource, duree, jour)}
+        return None
+
+    def check_move(self, p: Move) -> dict | None:
+        try:
+            r = self._ligne(p.reference)
+        except ToolError as e:
+            return {"argument": "reference", "reason": str(e), "options": []}
+        if r["status"] != "booked":
+            return {"argument": "reference", "reason": "cette réservation est annulée", "options": []}
+        duree = datetime.fromisoformat(r["end"]) - datetime.fromisoformat(r["start"])
+        if raison := self._probleme(r["resource"], p.new_start, duree, r["reference"]):
+            jour = p.new_start.replace(hour=0, minute=0, second=0, microsecond=0)
+            return {"argument": "new_start", "reason": raison,
+                    "options": self._propositions(r["resource"], duree, jour, r["reference"])}
+        return None
+
+    def check_cancel(self, p: Ref) -> dict | None:
+        try:
+            r = self._ligne(p.reference)
+        except ToolError as e:
+            return {"argument": "reference", "reason": str(e), "options": []}
+        if r["status"] != "booked":
+            return {"argument": "reference", "reason": "cette réservation est déjà annulée", "options": []}
+        return None
+
+    def check_find(self, p: Ref) -> dict | None:
+        try:
+            self._ligne(p.reference)
+        except ToolError as e:
+            return {"argument": "reference", "reason": str(e), "options": []}
+        return None
 
     # ------------------------------------------------------------------ actions -----------
     def free_slots(self, p: FreeSlots) -> dict:

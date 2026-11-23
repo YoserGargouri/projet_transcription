@@ -50,6 +50,13 @@ class Persona(Strict):
                                    description="Combinaison demandée absente du catalogue")
     change_prompt: str = Field("D'accord. Que souhaitez-vous modifier ?",
                                description="Réponse quand l'utilisateur refuse le récapitulatif")
+    no_answer_message: str = Field("Je n'ai pas cette information. Souhaitez-vous que je vous passe un conseiller ?",
+                                   description="Question d'information sans réponse dans la base de connaissances "
+                                               "(le LLM n'a le droit de répondre qu'à partir de la base)")
+    unavailable_message: str = Field("Ce n'est pas possible à ce moment-là. Je peux vous proposer {options}. "
+                                     "Qu'est-ce qui vous conviendrait ?",
+                                     description="Valeur refusée par la vérification de l'outil (ex. créneau "
+                                                 "pris) ; {options} = propositions de l'outil")
 
 
 class ScopeRule(Strict):
@@ -195,6 +202,13 @@ class KnowledgeSpec(Strict):
                               description="Zone grise [min_score - llm_margin, min_score[ : l'appel LLM du tour "
                                           "choisit parmi les llm_top_k meilleures fiches, ou aucune")
     llm_top_k: int = Field(3, ge=1, le=10)
+    answer_mode: Literal["verbatim", "grounded"] = Field(
+        "verbatim", description="verbatim : la réponse de la fiche est lue mot pour mot | grounded : le LLM "
+                                "rédige la réponse À PARTIR des fiches fournies et doit citer celles qu'il "
+                                "utilise (sources vérifiées) ; sans source, no_answer_message")
+    llm_context: Literal["top_k", "all"] = Field(
+        "top_k", description="Fiches données au LLM (mode llm_first) : les llm_top_k plus proches de la "
+                             "question, ou toute la base (petite base : aucune fiche ratée par la recherche)")
 
 
 # --- Workflows ------------------------------------------------------------------------------
@@ -292,6 +306,8 @@ class YesNoSpec(Strict):
 # --- Canaux ---------------------------------------------------------------------------------
 class SttSpec(Strict):
     engine: str = "whisper-small"
+    prompt: str = Field("", description="Phrase de contexte donnée au STT (vocabulaire du métier) : Whisper "
+                                        "reconnaît mieux les mots qu'elle contient")
 
 
 class TtsSpec(Strict):
@@ -325,6 +341,12 @@ class ChannelsSpec(Strict):
 class LLMSpec(Strict):
     system_prompt: str = Field(description="Texte du prompt système, ou chemin d'un fichier du pack")
     max_history_turns: int = Field(6, ge=0)
+    mode: Literal["rules_first", "llm_first"] = Field(
+        "rules_first",
+        description="rules_first : les règles qualifient la demande, le LLM n'intervient que si elles ne "
+                    "suffisent pas | llm_first : le LLM comprend CHAQUE tour (intention, informations, "
+                    "réponse) ; les règles deviennent un indice pour lui et le repli s'il est indisponible. "
+                    "Dans les deux modes : au plus un appel par tour, garde-fous et scripts fixes inchangés")
 
 
 class LoggingSpec(Strict):

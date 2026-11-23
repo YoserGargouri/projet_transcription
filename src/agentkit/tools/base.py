@@ -39,6 +39,20 @@ class Tool:
             raise ToolError(f"outil {self.name}.{action} : paramètres invalides : {e.errors()}") from e
         return getattr(self, action)(params)
 
+    def check(self, action: str, arguments: dict[str, Any]) -> dict[str, Any] | None:
+        """L'action serait-elle acceptée ? None = oui (ou vérification non prévue par l'outil) ;
+        sinon {"argument": nom de l'argument fautif, "reason": ..., "options": [alternatives]}.
+        Appelé avant le récapitulatif, pour ne pas faire confirmer une action impossible."""
+        if action not in self.actions:
+            return None
+        try:
+            params = self.actions[action](**arguments)
+        except ValidationError as e:
+            loc = e.errors()[0]["loc"]
+            return {"argument": str(loc[0]) if loc else None, "reason": "valeur invalide", "options": []}
+        verifier = getattr(self, f"check_{action}", None)
+        return verifier(params) if verifier else None
+
     def json_schema(self) -> dict[str, Any]:
         """Schéma des actions, pour le prompt / le contrat du LLM."""
         return {"name": self.name, "description": self.description,

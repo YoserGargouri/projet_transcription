@@ -29,10 +29,13 @@ def main():
     ap.add_argument("--tts", choices=["elevenlabs", "gtts", "piper"], help="forcer le moteur TTS")
     ap.add_argument("--sans-llm", action="store_true")
     ap.add_argument("--jouer", action="store_true", help="lire chaque réponse")
+    ap.add_argument("--verbose", "-v", action="store_true", help="afficher les étapes (STT, LLM, TTS...)")
     args = ap.parse_args()
+    config.configurer_journal(args.verbose)
 
     orch = Orchestrator.from_domain(args.domaine, gateway=None if args.sans_llm else "env")
-    stt = creer_moteur(args.stt or orch.pack.channels.audio.stt.engine, langue=orch.pack.language)
+    stt = creer_moteur(args.stt or orch.pack.channels.audio.stt.engine, langue=orch.pack.language,
+                       prompt=orch.pack.channels.audio.stt.prompt)
     canal = AudioChannel(orch, stt=stt, tts=TTSService.from_pack(orch.pack, engine=args.tts))
     orch.warmup()                                         # modèles chargés avant le premier tour
     dossier = config.runtime_dir("appels", orch.state.session_id)
@@ -55,12 +58,15 @@ def main():
         print(f"vous  > {r.transcript or '(rien compris)'}   [confiance {r.stt_confidence:.0%}, "
               f"qualité {r.quality_decision}, SNR {r.quality['snr_db']} dB]")
         print(f"agent > {r.reply}")
+        print(f"        {config.resume_agent(r.turn.trace)}")
         print(f"        latences : {json.dumps(r.timings, ensure_ascii=False)}")
         if args.jouer:
             jouer(r.reply_audio)
         if r.turn.escalated:
             print(f"[transfert vers un humain : {r.turn.escalation_reason}]")
             break
+    if orch.gateway:
+        print(f"[usage LLM : {orch.gateway.usage.snapshot()}]")
 
 
 if __name__ == "__main__":

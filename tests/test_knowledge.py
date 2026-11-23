@@ -45,9 +45,15 @@ def test_hybride_avec_encodeur_injecte():
     assert r.search("vous prenez la carte vitale", k=1)[0].id == "F14" and not r.degrade
 
 
+def mode(pack, m):
+    """Copie du pack dans un autre mode (le pack chargé est partagé : on ne le modifie pas)."""
+    return pack.model_copy(update={"llm": pack.llm.model_copy(update={"mode": m})})
+
+
 def _orch_zone_grise(reponse_llm):
-    """Imagerie, FAQ forcée en zone grise ; le LLM simulé choisit (ou non) une fiche."""
-    pack = load_domain("imagerie_medicale")
+    """Imagerie en mode rules_first (le repli), FAQ forcée en zone grise ; le LLM simulé
+    choisit (ou non) une fiche, lue mot pour mot."""
+    pack = mode(load_domain("imagerie_medicale"), "rules_first")
     fake = FakeLLM([reponse_llm] if not callable(reponse_llm) else reponse_llm)
     o = Orchestrator(pack, gateway=LLMGateway(fake))
     o.retriever = HybridRetriever(pack, encoder=EncodeurEnPanne())   # lexical, déterministe

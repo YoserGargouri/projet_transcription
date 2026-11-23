@@ -29,6 +29,7 @@ class ScopeGuard:
         self._regles = [(r.id, [re.compile(p) for p in r.patterns], [re.compile(p) for p in r.weak_patterns],
                          set(r.except_if_intents)) for r in pack.scope.forbidden]
         self._humain = [re.compile(p) for p in pack.scope.human_request_patterns]
+        self._specs = pack.scope.forbidden
 
     def check(self, text: str, intent: str | None = None) -> ScopeViolation | None:
         t = normalise(text)
@@ -41,6 +42,19 @@ class ScopeGuard:
                     if m.search(t):
                         return ScopeViolation(rid, m.pattern)
         return None
+
+    def check_strong(self, text: str) -> ScopeViolation | None:
+        """Motifs forts seulement. En mode llm_first, ils transfèrent toujours sans passer par le
+        LLM ; les motifs faibles (check) deviennent une alerte donnée au LLM, qui décide."""
+        t = normalise(text)
+        for rid, forts, _, _ in self._regles:
+            for m in forts:
+                if m.search(t):
+                    return ScopeViolation(rid, m.pattern)
+        return None
+
+    def rule(self, rule_id: str):
+        return next(r for r in self._specs if r.id == rule_id)
 
     def wants_human(self, text: str) -> bool:
         t = normalise(text)

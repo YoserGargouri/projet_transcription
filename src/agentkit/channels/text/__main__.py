@@ -19,7 +19,9 @@ def main():
     ap.add_argument("--domaine", default=config.domaine_par_defaut())
     ap.add_argument("--sans-llm", action="store_true", help="forcer les règles seules")
     ap.add_argument("--trace", action="store_true", help="afficher la trace de chaque tour")
+    ap.add_argument("--verbose", "-v", action="store_true", help="afficher les étapes (LLM, repli...)")
     args = ap.parse_args()
+    config.configurer_journal(args.verbose)
 
     orch = Orchestrator.from_domain(args.domaine, gateway=None if args.sans_llm else "env")
     orch.warmup()
@@ -34,6 +36,7 @@ def main():
             break
         r = orch.handle_text(texte)
         print(f"agent > {r.reply}")
+        print(f"        {config.resume_agent(r.trace)}")
         if args.trace:
             print("        " + json.dumps(r.trace, ensure_ascii=False, default=str))
         if r.escalated:

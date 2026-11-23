@@ -13,10 +13,18 @@ Un tour, dans l'ordre (les étapes sans LLM d'abord) :
  5. intention (routeur) puis périmètre interdit          (au plus 1 appel LLM) -> revalidation ->
                                                          scripts de sécurité -> slot suivant ->
                                                          confirmation -> outil final
-Chaque tour est journalisé, anonymisé (logging.redaction).
+Mode llm_first (llm.mode du pack) : à l'étape 5, le LLM comprend le tour (un seul appel) :
+intention, informations, élément, réponse rédigée à partir de la base de connaissances (sources
+citées et vérifiées). Les règles du routeur deviennent un indice ; si le LLM est indisponible, le
+tour repart sur le chemin des règles. Restent hors LLM : demande d'humain, motifs forts du
+périmètre interdit, scripts de sécurité, revalidation de l'élément (D3), vérification par l'outil,
+récapitulatif et confirmation, action finale.
+Chaque tour est journalisé, anonymisé (logging.redaction) ; les étapes sont tracées par le
+module logging (« agentkit.* », sans texte de l'utilisateur ni clé).
 """
 from __future__ import annotations
 
+import logging
 import uuid
 from dataclasses import asdict, dataclass, field
 from typing import Any
@@ -28,6 +36,7 @@ from agentkit.domain.schema import DomainPack
 from agentkit.knowledge.retriever import build_retriever
 from agentkit.llm.gateway import LLMGateway, gateway_from_env
 from agentkit.logging.redaction import ConversationLogger
+from agentkit.nlu import dates
 from agentkit.nlu.resolver import CatalogueResolver, Resolution
 from agentkit.nlu.router import RuleRouter
 from agentkit.policy.escalation import Escalation, EscalationPolicy
@@ -36,6 +45,12 @@ from agentkit.signals.base import build_signals
 from agentkit.tools.base import ToolError
 from agentkit.tools.registry import ToolRegistry
 from agentkit.workflows.engine import WorkflowEngine, WorkflowRun
+
+log = logging.getLogger("agentkit.tour")
+
+
+def _option_choisie(texte: str, options: list[str]) -> str | None:
+    return dates.option_choisie(texte, options)
 
 
 @dataclass
@@ -56,6 +71,7 @@ class ConversationState:
     failed_clarifications: int = 0
     unrecognised_turns: int = 0
     audio_failures: int = 0
+    slot_options: dict[str, list[str]] = field(default_factory=dict)   # alternatives proposées par l'outil
     history: list[dict] = field(default_factory=list)
     escalation: Escalation | None = None
 
@@ -91,6 +107,11 @@ class Orchestrator:
         self.policy = policy or (SingleCallPolicy(pack, gateway) if gateway else NoLLMPolicy())
         self.state = ConversationState(session_id=session_id or uuid.uuid4().hex[:12])
         self.logger = ConversationLogger(pack, self.state.session_id) if log else None
+        self._sans_llm = False      # vrai pendant un tour où le LLM a échoué (repli sur les règles)
+
+    @property
+    def llm_first(self) -> bool:
+        return self.pack.llm.mode == "llm_first" and self.gateway is not None
 
     @classmethod
     def from_domain(cls, domain: str, gateway: LLMGateway | None | str = "env", **kw) -> Orchestrator:
@@ -114,7 +135,9 @@ class Orchestrator:
         if self.gateway:
             self.gateway.begin_turn(f"{s.session_id}:{s.turn}", self.policy.max_llm_calls_per_turn)
         s.history.append({"role": "user", "text": text})
-        trace: dict[str, Any] = {"turn": s.turn}
+        self._sans_llm = False
+        trace: dict[str, Any] = {"turn": s.turn, "mode": "llm_first" if self.llm_first else "rules_first"}
+        log.info("tour %d (%s, %d car.)", s.turn, trace["mode"], len(text))
         if s.escalation:                                        # déjà transféré
             return self._result(self.pack.persona.handoff_message, trace)
 
@@ -125,11 +148,20 @@ class Orchestrator:
         if s.safety_pending:                                    # 3. script de sécurité
             return self._safety_answer(text, trace)
         if s.awaiting_confirmation:                             # 4. confirmation
-            return self._confirmation_answer(text, trace)
+            # Oui / non nets : règles. Réponse floue (« oui mais plutôt à 10 h ») : le LLM en mode llm_first
+            if not self.llm_first or self.safety.parse_answer(text) != "unclear":
+                return self._confirmation_answer(text, trace)
 
         route = self.router.route(text)                         # 5. intention
-        intent = route.intent
         trace["route"] = asdict(route)
+        if self.llm_first:
+            r = self._llm_turn(text, route, scores, trace)
+            if r is not None:
+                return r
+            self._sans_llm = True                               # LLM indisponible : ce tour suit les règles
+            if s.awaiting_confirmation:
+                return self._confirmation_answer(text, trace)
+        intent = route.intent
         handler = self.pack.intent(intent).handler
         if s.run and (not route.matched or handler == f"workflow:{s.run.workflow_id}"):
             intent, handler = s.intent, f"workflow:{s.run.workflow_id}"   # on reste dans le workflow
@@ -170,7 +202,7 @@ class Orchestrator:
         d = self.retriever.decide(text)
         trace["knowledge"] = {"zone": d.zone, "hits": [(h.id, h.score) for h in d.hits]}
         fiche = d.best if d.zone == "direct" else None
-        if d.zone == "grey" and self.gateway is not None:
+        if d.zone == "grey" and self.gateway is not None and not self._sans_llm:
             ctx = TurnContext(text=text, intent=self.state.intent or self.router.route(text).intent,
                               rules_reply=self.pack.persona.fallback_message, needs_llm=True,
                               knowledge=[{"id": h.id, "question": h.question, "reponse": h.answer} for h in d.hits],
@@ -209,10 +241,16 @@ class Orchestrator:
                 if resolution.status == "ambiguous" and s.pending_clarification:
                     s.failed_clarifications += 1
 
+        if s.pending_slot in s.slot_options and not self.llm_first:
+            # sans LLM, « la première » / « la deuxième » désigne une des options proposées
+            if (choix := _option_choisie(text, s.slot_options[s.pending_slot])) is not None:
+                text = choix
         regles = {}                                              # réponse brute au slot demandé
         if s.pending_slot and (slot_item is None or s.pending_slot != slot_item.name):
             regles[s.pending_slot] = text
         trace["slot_errors"] = self.workflows.set_slots(run, regles)
+        if s.pending_slot and s.pending_slot in trace["slot_errors"] and self._sans_llm is False and self.gateway is None:
+            s.failed_clarifications += 1                         # sans LLM : réponse non comprise au slot demandé
 
         ctx = self._contexte(text, intent, run, resolution, scores)   # 8b. politique d'agent
         decision = self.policy.decide(ctx)
@@ -232,13 +270,35 @@ class Orchestrator:
         return self._next_step(trace, reply=decision.reply if decision.llm_used else None,
                                resolution=resolution)
 
-    def _next_step(self, trace: dict, reply: str | None = None, resolution: Resolution | None = None) -> TurnResult:
-        """Le SYSTÈME choisit l'étape suivante ; le LLM ne fait que formuler la réponse."""
+    def _next_step(self, trace: dict, reply: str | None = None, resolution: Resolution | None = None,
+                   asks_for: str | None = None, conversational: bool = False, answered: bool = False) -> TurnResult:
+        """Le SYSTÈME choisit l'étape suivante ; le LLM ne fait que formuler la réponse.
+
+        conversational (llm_first) : la réponse du LLM est gardée si elle demande une
+        information réellement manquante (asks_for) ; sinon le système pose sa propre question
+        (précédée de la réponse du LLM si celle-ci répondait à une question d'information)."""
         s, run = self.state, self.state.run
         s.pending_clarification = False
         if s.safety_queue:                                       # scripts de sécurité d'abord
             return self._ask_safety(trace)
-        manquant = self.workflows.next_missing(run)
+        manquants = self.workflows.missing(run)
+        if manquants and conversational:
+            noms = {m.name: m for m in manquants}
+            ambigu = resolution is not None and resolution.status == "ambiguous" and resolution.question
+            if asks_for in noms and reply:
+                s.pending_slot = asks_for
+                s.pending_clarification = bool(ambigu and noms[asks_for].type == "catalogue_item")
+                return self._result(reply, trace, question=True)
+            manquant = manquants[0]
+            s.pending_slot = manquant.name
+            question = manquant.prompt
+            if manquant.type == "catalogue_item" and ambigu:
+                s.pending_clarification, s.pending_slot, question = True, None, resolution.question
+            elif manquant.type == "catalogue_item" and resolution is not None and resolution.status == "infeasible":
+                question = f"{self.pack.persona.not_found_message} {manquant.prompt}"
+            texte = f"{reply} {question}" if answered and reply else question
+            return self._result(texte, trace, question=True)
+        manquant = manquants[0] if manquants else None
         if manquant is not None:
             s.pending_slot = manquant.name
             if manquant.type == "catalogue_item" and resolution is not None and not reply:
@@ -250,6 +310,19 @@ class Orchestrator:
                     return self._result(f"{self.pack.persona.not_found_message} {manquant.prompt}", trace)
             return self._result(reply or manquant.prompt, trace, question=True)
         s.pending_slot = None
+        if (pb := self.workflows.precheck(run)) is not None:    # l'outil refuserait : on redemande
+            trace["precheck"] = pb
+            log.info("vérification de l'outil : refus (%s), %d alternative(s)", pb["reason"], len(pb["options"]))
+            slot = next((x for x in self.workflows.spec(run).slots if x.name == pb["slot"]), None)
+            s.pending_slot = pb["slot"]
+            if pb["options"] and pb["slot"]:
+                s.slot_options[pb["slot"]] = pb["options"]
+                texte = self.pack.persona.unavailable_message.format(options=self._dire_options(pb["options"]))
+            else:
+                texte = f"{pb['reason'][:1].upper()}{pb['reason'][1:]}. {slot.prompt if slot else ''}".strip()
+            if not slot:                                         # problème non rattaché à un slot : humain
+                return self._escalate(Escalation("tool_error", pb["reason"]), trace)
+            return self._result(texte, trace, question=True)
         if (texte := self.workflows.confirmation_text(run)) is not None:
             s.awaiting_confirmation = True
             return self._result(texte, trace, question=True)
@@ -270,13 +343,173 @@ class Orchestrator:
         # Réponse des règles : clarification, sinon question du prochain slot (ou récapitulatif)
         regles = clarification or (manquant.prompt if manquant else self.workflows.confirmation_text(run) or "")
         # D1 : pas d'appel LLM quand les règles ont une question précise de clarification
-        besoin = self.gateway is not None and clarification is None
+        besoin = self.gateway is not None and clarification is None and not self._sans_llm
         return TurnContext(
             text=text, intent=intent, rules_reply=regles or self.pack.persona.fallback_message, needs_llm=besoin,
             workflow=spec.id, slot_names=[x.name for x in spec.slots if x.type != "catalogue_item"],
             filled_slots={k: v for k, v in run.slots.items() if v}, candidates=candidats, candidate_details=details,
             next_slot={"name": manquant.name, "prompt": manquant.prompt} if manquant else None,
             clarification=clarification, history=s.history[:-1], signals=scores)
+
+    # ================================================================== mode llm_first ========
+    def _llm_turn(self, text: str, route, scores: dict, trace: dict) -> TurnResult | None:
+        """Le LLM comprend le tour (un appel). None si le LLM est indisponible : l'appelant
+        reprend alors le chemin des règles pour ce tour."""
+        s = self.state
+        if v := self.guard.check_strong(text):                  # motifs forts : jamais par le LLM
+            return self._escalate(Escalation("out_of_scope", v.rule_id), trace)
+        if e := self.escalation_policy.from_signals(scores):
+            return self._escalate(e, trace)
+        alerte = self.guard.check(text, route.intent if route.matched else None)   # motif faible -> au LLM
+
+        fiches = self._fiches_pour_llm(text)
+        trace["knowledge"] = {"provided": [f["id"] for f in fiches]}
+        run = s.run
+        resolution: Resolution | None = None
+        if self.resolver and (run is None or (self.workflows.item_slot(run) and run.item is None)):
+            resolution = self.resolver.resolve(text, s.resolution_context if run else {})
+        if run is not None and run.item is not None:
+            candidats = [run.item["id"]]
+        elif resolution is not None and resolution.status != "unknown":
+            candidats = (resolution.candidates if resolution.status == "ambiguous"
+                         else self.resolver.candidates_for_llm(resolution, text))
+        elif run is not None and self.workflows.item_slot(run):
+            candidats = self.resolver.candidates_for_llm(resolution, text) if resolution else []
+        else:
+            candidats = []
+        details = [{"code": c, "libelle": self.catalogue.by_id[c].label, **self.catalogue.by_id[c].attributes}
+                   for c in candidats] if self.catalogue else []
+        clarification = resolution.question if resolution and resolution.status == "ambiguous" else None
+
+        manquants = self.workflows.missing(run) if run else []
+        tous_slots = [x for w in self.pack.workflows for x in w.slots]
+        extra = {
+            "date_et_heure_actuelles": dates.maintenant_pour_llm(),
+            "indice_des_regles": route.intent if route.matched else None,
+            "alerte_perimetre": self.guard.rule(alerte.rule_id).description if alerte else None,
+            "element_choisi": run.item.get("libelle") if run and run.item else None,
+            "informations_manquantes": [m.name for m in manquants],
+            "question_posee_au_tour_precedent": s.last_question if run else None,
+            "options_proposees": {k: [{"valeur": o, "dit": dates.dire(o, self.pack.language)} for o in v]
+                                  for k, v in s.slot_options.items()},
+            "recapitulatif_en_attente": self.workflows.confirmation_text(run) if s.awaiting_confirmation else None,
+        }
+        ctx = TurnContext(
+            text=text, intent=s.intent or route.intent, rules_reply=self.pack.persona.fallback_message,
+            needs_llm=True, conversational=True, workflow=run.workflow_id if run else None,
+            slot_names=list(dict.fromkeys(x.name for x in tous_slots if x.type != "catalogue_item")),
+            askable_slots=list(dict.fromkeys(x.name for x in tous_slots)),
+            filled_slots={k: v for k, v in (run.slots if run else {}).items() if v},
+            next_slot={"name": manquants[0].name, "prompt": manquants[0].prompt} if manquants else None,
+            candidates=candidats, candidate_details=details, clarification=clarification,
+            knowledge=fiches, knowledge_ids=[f["id"] for f in fiches], history=s.history[:-1], signals=scores,
+            extra=extra)
+        d = self.policy.decide(ctx)
+        trace["agent"] = {"llm_used": d.llm_used, "fallback": d.fallback, "intent": d.intent,
+                          "understood": d.understood, "sources": d.sources, "asks_for": d.asks_for,
+                          "slots": sorted(k for k, v in d.slots.items() if v)}
+        if not d.llm_used:
+            log.info("LLM indisponible : le tour continue avec les règles")
+            trace["llm_failure"] = d.fallback
+            return None
+        log.info("LLM : intention=%s compris=%s sources=%s demande=%s escalade=%s", d.intent, d.understood,
+                 d.sources, d.asks_for, d.escalate)
+        if d.escalate:
+            return self._escalate(Escalation("agent_requested", d.escalate_reason), trace)
+        s.awaiting_confirmation = False
+
+        handler = self.pack.intent(d.intent).handler
+        if handler.startswith("workflow:"):
+            wid = handler.split(":", 1)[1]
+            if s.run is None or s.run.workflow_id != wid:
+                if s.run is not None:
+                    trace["workflow_switch"] = {"from": s.run.workflow_id, "to": wid}
+                s.run, s.intent = self.workflows.start(wid), d.intent
+                s.resolution_context, s.candidates, s.pending_slot, s.slot_options = {}, [], None, {}
+                s.failed_clarifications = 0
+                if resolution is None and self.resolver and self.workflows.item_slot(s.run):
+                    resolution = self.resolver.resolve(text, {})
+            s.unrecognised_turns = 0
+            return self._workflow_llm(text, d, resolution, ctx, trace)
+
+        # Pas une démarche : information, salutation, hors sujet...
+        if not d.understood:
+            s.unrecognised_turns += 1
+            if e := self.escalation_policy.from_counters(0, s.unrecognised_turns, s.audio_failures):
+                return self._escalate(e, trace)
+        else:
+            s.unrecognised_turns = 0
+        reply = self._reponse_fondee(d, ctx, trace, handler == "knowledge")
+        if s.run is not None:                                   # digression : on revient à la démarche
+            return self._next_step(trace, reply=reply, asks_for=d.asks_for, conversational=True, answered=True)
+        return self._result(reply, trace, question=reply.rstrip().endswith("?"))
+
+    def _fiches_pour_llm(self, text: str) -> list[dict]:
+        if self.retriever is None or self.pack.knowledge is None:
+            return []
+        k = self.pack.knowledge
+        if k.llm_context == "all":
+            df = self.retriever_df()
+            return [{"id": r[k.id_column], "question": r[k.question_column], "reponse": r[k.answer_column]}
+                    for _, r in df.iterrows()]
+        return [{"id": h.id, "question": h.question, "reponse": h.answer}
+                for h in self.retriever.search(text, k=k.llm_top_k)]
+
+    def retriever_df(self):
+        r = self.retriever
+        return getattr(r, "df", None) if hasattr(r, "df") else r.lexical.df
+
+    def _reponse_fondee(self, d, ctx: TurnContext, trace: dict, question_d_information: bool) -> str:
+        """La réponse du LLM n'est gardée pour une question d'information que si elle cite des
+        fiches réellement fournies ; en mode verbatim, on lit la fiche citée mot pour mot."""
+        sources = [x for x in d.sources if x in ctx.knowledge_ids]
+        trace["knowledge"]["used"] = sources
+        k = self.pack.knowledge
+        if k is not None and k.answer_mode == "verbatim" and sources:
+            return next(f["reponse"] for f in ctx.knowledge if f["id"] == sources[0])
+        if question_d_information and not sources:
+            log.info("réponse d'information sans source : message « pas d'information »")
+            trace["knowledge"]["unsupported"] = True
+            return self.pack.persona.no_answer_message
+        return d.reply
+
+    def _workflow_llm(self, text: str, d, resolution: Resolution | None, ctx: TurnContext, trace: dict) -> TurnResult:
+        s, run = self.state, self.state.run
+        slot_item = self.workflows.item_slot(run)
+        if slot_item and run.item is None and self.resolver:
+            if resolution is not None:
+                s.resolution_context = {**s.resolution_context, **resolution.context}
+                trace["resolution"] = {"status": resolution.status, "item": resolution.item_id,
+                                       "candidates": resolution.candidates[:10], "confidence": resolution.confidence}
+            if resolution is not None and resolution.item_id:
+                self._set_item(resolution.item_id)
+            elif d.item_code and d.item_code in ctx.candidates and d.item_code in self.catalogue.by_id:
+                self._set_item(d.item_code)                     # revalidation D3
+                trace["item_source"] = "llm"
+            elif resolution is not None:
+                s.candidates = resolution.candidates
+                if resolution.status == "ambiguous" and s.pending_clarification:
+                    s.failed_clarifications += 1
+        valeurs = {k: v for k, v in d.slots.items() if v}
+        for nom, v in list(valeurs.items()):                    # « la deuxième » -> option proposée
+            if nom in s.slot_options and (choix := _option_choisie(v, s.slot_options[nom])) is not None:
+                valeurs[nom] = choix
+        erreurs = self.workflows.set_slots(run, valeurs)
+        for nom in valeurs:
+            if nom not in erreurs:
+                s.slot_options.pop(nom, None)
+        if erreurs:
+            trace["slot_errors"] = erreurs
+            log.info("valeurs refusées par la validation : %s", sorted(erreurs))
+        if e := self.escalation_policy.from_counters(s.failed_clarifications, s.unrecognised_turns, s.audio_failures):
+            return self._escalate(e, trace)
+        return self._next_step(trace, reply=d.reply, resolution=resolution, asks_for=d.asks_for,
+                               conversational=True, answered=bool(d.sources))
+
+    def _dire_options(self, options: list[str]) -> str:
+        dits = [dates.dire(o, self.pack.language) for o in options]
+        j = self.pack.catalogue.options_joiner if self.pack.catalogue else " ou "
+        return dits[0] if len(dits) == 1 else ", ".join(dits[:-1]) + j + dits[-1]
 
     # ================================================================== sécurité / fin ========
     def _set_item(self, item_id: str) -> None:
@@ -329,7 +562,8 @@ class Orchestrator:
         except ToolError as e:
             return self._escalate(Escalation("tool_error", str(e)), trace)
         trace["tool_result"] = resultat
-        s.run, s.intent, s.candidates, s.resolution_context = None, None, [], {}
+        log.info("action finale réussie (%s)", s.run.workflow_id)
+        s.run, s.intent, s.candidates, s.resolution_context, s.slot_options = None, None, [], {}, {}
         return self._result(message or self.pack.persona.goodbye_message, trace)
 
     def _unrecognised(self, trace: dict) -> TurnResult:
@@ -349,6 +583,8 @@ class Orchestrator:
         if question:
             s.last_question = reply
         appels = self.gateway.calls_this_turn() if self.gateway else 0
+        log.info("réponse prête (%d car., %d appel(s) LLM%s)", len(reply), appels,
+                 f", transfert : {s.escalation.reason}" if s.escalation else "")
         r = TurnResult(reply=reply, intent=s.intent or trace.get("route", {}).get("intent"),
                        escalated=s.escalation is not None,
                        escalation_reason=s.escalation.reason if s.escalation else None,

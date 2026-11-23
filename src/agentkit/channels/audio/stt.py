@@ -36,17 +36,20 @@ def charger_16k(chemin) -> np.ndarray:
 class Whisper:
     """faster-whisper, exécuté sur le processeur. Modèle téléchargé au premier usage."""
 
-    def __init__(self, taille: str = "small", langue: str | None = None):
+    def __init__(self, taille: str = "small", langue: str | None = None, prompt: str | None = None):
         from faster_whisper import WhisperModel
 
         self.nom = f"whisper-{taille}"
         self.langue = langue  # None : détection automatique de la langue
+        # Phrase de contexte (vocabulaire du métier, channels.audio.stt.prompt du pack) : Whisper
+        # reconnaît mieux les mots qu'elle contient (noms de produits, termes du métier...)
+        self.prompt = prompt or None
         self.modele = WhisperModel(taille, device="cpu", compute_type="int8")
 
     def transcrire(self, chemin) -> dict:
         t0 = time.perf_counter()
         segments, _ = self.modele.transcribe(charger_16k(chemin), language=self.langue, beam_size=5,
-                                             word_timestamps=True)
+                                             word_timestamps=True, initial_prompt=self.prompt)
         segments = list(segments)  # la transcription a réellement lieu ici
         latence = time.perf_counter() - t0
         mots = [w for s in segments for w in (s.words or [])]
@@ -128,15 +131,16 @@ class ElevenLabsSTT:
 
 
 MOTEURS = {
-    "whisper-tiny": lambda langue: Whisper("tiny", langue),
-    "whisper-base": lambda langue: Whisper("base", langue),
-    "whisper-small": lambda langue: Whisper("small", langue),
-    "vosk": lambda langue: Vosk(langue or "fr"),
-    "elevenlabs": lambda langue: ElevenLabsSTT(langue),
+    "whisper-tiny": lambda langue, prompt=None: Whisper("tiny", langue, prompt),
+    "whisper-base": lambda langue, prompt=None: Whisper("base", langue, prompt),
+    "whisper-small": lambda langue, prompt=None: Whisper("small", langue, prompt),
+    "vosk": lambda langue, prompt=None: Vosk(langue or "fr"),
+    "elevenlabs": lambda langue, prompt=None: ElevenLabsSTT(langue),
 }
 
 
-def creer_moteur(nom: str, langue: str | None = None):
+def creer_moteur(nom: str, langue: str | None = None, prompt: str | None = None):
+    """prompt : vocabulaire du métier (utilisé par Whisper, ignoré par les autres moteurs)."""
     if nom not in MOTEURS:
         raise ValueError(f"moteur STT inconnu : {nom} (disponibles : {', '.join(MOTEURS)})")
-    return MOTEURS[nom](langue)
+    return MOTEURS[nom](langue, prompt)

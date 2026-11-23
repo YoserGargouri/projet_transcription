@@ -18,6 +18,7 @@ Garanties :
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
 from typing import TypeVar
@@ -29,6 +30,7 @@ from agentkit.llm.cache import ResponseCache, cle_requete
 from agentkit.llm.usage import Usage
 
 M = TypeVar("M", bound=BaseModel)
+log = logging.getLogger("agentkit.llm")
 
 
 class LLMError(Exception):
@@ -100,6 +102,7 @@ class LLMGateway:
             try:
                 sortie = output_model.model_validate(en_cache)
                 self.usage.cache_hits += 1
+                log.info("%s : réponse en cache (0 jeton)", self.name)
                 return sortie
             except ValidationError:
                 pass  # le schéma a changé depuis : on redemande
@@ -109,13 +112,17 @@ class LLMGateway:
             if tentative:
                 self.usage.retries += 1
             t0 = time.perf_counter()
+            log.info("%s : appel%s", self.name, " (nouvelle tentative)" if tentative else "")
             try:
                 rep = self.provider.chat(msgs, schema)
             except Exception as e:  # réseau, HTTP, quota...
                 self.usage.errors += 1
+                log.warning("%s : échec après %.2f s (%s)", self.name, time.perf_counter() - t0, type(e).__name__)
                 raise LLMError(f"{type(e).__name__} : {str(e)[:200]}") from e
             finally:
                 self.usage.latency_s += time.perf_counter() - t0
+            log.info("%s : réponse en %.2f s (%d + %d jetons)", getattr(self.provider, "last_model", self.name),
+                     time.perf_counter() - t0, rep.prompt_tokens, rep.completion_tokens)
             self.usage.requests += 1
             self.usage.prompt_tokens += rep.prompt_tokens
             self.usage.completion_tokens += rep.completion_tokens
@@ -124,6 +131,7 @@ class LLMGateway:
                 dernier = json.loads(_extraire_json(rep.text))
                 sortie = output_model.model_validate(dernier)
             except (json.JSONDecodeError, ValidationError) as e:
+                log.warning("%s : sortie non conforme au contrat (%s)", self.name, type(e).__name__)
                 msgs = msgs + [{"role": "assistant", "content": rep.text},
                                {"role": "user", "content": f"Ta réponse n'est pas valide ({_erreurs_courtes(e)}). "
                                                            "Renvoie uniquement l'objet JSON corrigé."}]
@@ -147,7 +155,9 @@ def gateway_from_env(use_cache: bool = True) -> LLMGateway | None:
     fournisseur = OpenAICompatibleProvider(base_url, config.env("LLM_API_KEY"), modele,
                                            json_mode=config.env("LLM_JSON_MODE", "json_schema"),
                                            timeout_s=float(config.env("LLM_TIMEOUT_S", "10") or 10),
-                                           reasoning_effort=config.env("LLM_REASONING_EFFORT"))
+                                           reasoning_effort=config.env("LLM_REASONING_EFFORT"),
+                                           fallback_models=[m.strip() for m in
+                                                            config.env("LLM_FALLBACK_MODELS").split(",")])
     cache = ResponseCache(config.runtime_dir("cache") / "llm.sqlite") if use_cache else None
     return LLMGateway(fournisseur, cache, max_calls=config.env_int("LLM_MAX_CALLS"),
                       max_tokens=config.env_int("LLM_MAX_TOKENS"))

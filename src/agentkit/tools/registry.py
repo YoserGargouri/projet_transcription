@@ -63,5 +63,8 @@ class ToolRegistry:
     def call(self, name: str, action: str, arguments: dict[str, Any]) -> dict[str, Any]:
         return self.get(name).call(action, arguments)
 
+    def check(self, name: str, action: str, arguments: dict[str, Any]) -> dict[str, Any] | None:
+        return self.get(name).check(action, arguments)
+
     def names(self) -> list[str]:
         return list(self.tools)
