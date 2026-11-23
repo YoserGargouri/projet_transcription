@@ -80,3 +80,11 @@ def test_meme_moteur_autre_pack():
     o = Orchestrator(load_domain("imagerie_medicale"))
     r = o.handle_text("Bonjour, je voudrais une IRM du genou")
     assert "côté" in r.reply and set(r.candidates) == {"IRM_GEN_G", "IRM_GEN_D"}
+
+
+def test_question_reposee_apres_une_digression(demo):
+    """Une question pratique au milieu d'un workflow : on répond, puis on repose la question en cours."""
+    o = Orchestrator(demo)
+    q = o.handle_text("je voudrais louer un vélo de ville").reply
+    r = o.handle_text("quels sont vos horaires ?")
+    assert r.reply.endswith(q) and "9 heures" in r.reply

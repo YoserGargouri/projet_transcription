@@ -22,6 +22,7 @@ def main():
     args = ap.parse_args()
 
     orch = Orchestrator.from_domain(args.domaine, gateway=None if args.sans_llm else "env")
+    orch.warmup()
     print(f"[pack {orch.pack.id} | LLM : {orch.gateway.name if orch.gateway else 'aucun (règles seules)'}]")
     print(f"agent > {orch.start()}")
     while True:

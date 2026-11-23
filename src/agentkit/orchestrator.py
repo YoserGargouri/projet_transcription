@@ -49,6 +49,7 @@ class ConversationState:
     pending_slot: str | None = None          # slot demandé au tour précédent
     pending_clarification: bool = False       # une question de clarification attend sa réponse
     awaiting_confirmation: bool = False
+    last_question: str | None = None          # dernière question posée (reposée après une digression)
     safety_queue: list[str] = field(default_factory=list)
     safety_pending: str | None = None
     safety_retries: int = 0
@@ -96,6 +97,12 @@ class Orchestrator:
         return cls(load_domain(domain), gateway_from_env() if gateway == "env" else gateway, **kw)
 
     # ================================================================== tour ==================
+    def warmup(self) -> None:
+        """Charge à l'avance ce qui est chargé à la demande (modèle d'embeddings de la FAQ) :
+        à appeler au démarrage d'un canal, pour que le premier tour ne paie pas le chargement."""
+        if self.retriever is not None:
+            self.retriever.search("bonjour", k=1)
+
     def start(self) -> str:
         self.state.history.append({"role": "agent", "text": self.pack.persona.greeting})
         return self.pack.persona.greeting
@@ -175,8 +182,8 @@ class Orchestrator:
         if fiche is None:
             return self._unrecognised(trace)
         reply = fiche.answer
-        if self.state.run and (slot := self.workflows.next_missing(self.state.run)):
-            reply += " " + slot.prompt                          # on revient au workflow en cours
+        if self.state.run and self.state.last_question:
+            reply += " " + self.state.last_question            # on revient au workflow en cours
         return self._result(reply, trace)
 
     def _workflow_turn(self, intent: str, workflow_id: str, text: str, scores: dict, trace: dict) -> TurnResult:
@@ -236,14 +243,14 @@ class Orchestrator:
                 if resolution.status == "ambiguous" and resolution.question:
                     s.pending_clarification = True
                     s.pending_slot = None
-                    return self._result(resolution.question, trace)
+                    return self._result(resolution.question, trace, question=True)
                 if resolution.status == "infeasible":
                     return self._result(f"{self.pack.persona.not_found_message} {manquant.prompt}", trace)
-            return self._result(reply or manquant.prompt, trace)
+            return self._result(reply or manquant.prompt, trace, question=True)
         s.pending_slot = None
         if (texte := self.workflows.confirmation_text(run)) is not None:
             s.awaiting_confirmation = True
-            return self._result(texte, trace)
+            return self._result(texte, trace, question=True)
         return self._complete(trace)
 
     def _contexte(self, text, intent, run: WorkflowRun, resolution: Resolution | None, scores) -> TurnContext:
@@ -281,7 +288,7 @@ class Orchestrator:
         s = self.state
         s.safety_pending, s.safety_retries = s.safety_queue.pop(0), 0
         trace["safety"] = {"asked": s.safety_pending}
-        return self._result(self.safety.get(s.safety_pending).question, trace)
+        return self._result(self.safety.get(s.safety_pending).question, trace, question=True)
 
     def _safety_answer(self, text: str, trace: dict) -> TurnResult:
         s = self.state
@@ -334,9 +341,11 @@ class Orchestrator:
         trace["escalation"] = asdict(e)
         return self._result(self.pack.persona.handoff_message, trace)
 
-    def _result(self, reply: str, trace: dict) -> TurnResult:
+    def _result(self, reply: str, trace: dict, question: bool = False) -> TurnResult:
         s = self.state
         s.history.append({"role": "agent", "text": reply})
+        if question:
+            s.last_question = reply
         appels = self.gateway.calls_this_turn() if self.gateway else 0
         r = TurnResult(reply=reply, intent=s.intent or trace.get("route", {}).get("intent"),
                        escalated=s.escalation is not None,
