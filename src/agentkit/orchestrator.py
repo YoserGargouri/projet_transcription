@@ -25,6 +25,7 @@ module logging (« agentkit.* », sans texte de l'utilisateur ni clé).
 from __future__ import annotations
 
 import logging
+import time
 import uuid
 from dataclasses import asdict, dataclass, field
 from typing import Any
@@ -562,10 +563,20 @@ class Orchestrator:
 
     def _complete(self, trace: dict) -> TurnResult:
         s = self.state
+        spec = self.workflows.spec(s.run)
+        appel = spec.on_complete
+        # action exécutée : de quoi la suivre hors de la conversation (tableau de bord, audit)
+        action = {"workflow": s.run.workflow_id, "tool": appel.tool if appel else None,
+                  "action": appel.action if appel else None, "item": (s.run.item or {}).get("id")}
+        t0 = time.perf_counter()
         try:
             resultat, message = self.workflows.complete(s.run)
         except ToolError as e:
+            trace["action"] = {**action, "status": "failed", "error": str(e)[:200],
+                               "duration_ms": round((time.perf_counter() - t0) * 1000, 1)}
             return self._escalate(Escalation("tool_error", str(e)), trace)
+        trace["action"] = {**action, "status": "succeeded",
+                           "duration_ms": round((time.perf_counter() - t0) * 1000, 1)}
         trace["tool_result"] = resultat
         log.info("action finale réussie (%s)", s.run.workflow_id)
         s.run, s.intent, s.candidates, s.resolution_context, s.slot_options = None, None, [], {}, {}

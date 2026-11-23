@@ -21,7 +21,9 @@ src/agentkit/          moteur générique (aucun vocabulaire métier, vérifié 
   knowledge/ signals/ policy/ workflows/ tools/ logging/
   channels/audio/      qualité, STT (Whisper, Vosk, ElevenLabs), TTS (ElevenLabs, gTTS, Piper)
   channels/text/       conversation au clavier
-  evaluation/          eval_stt
+  evaluation/          eval_stt, eval_router, eval_knowledge, eval_conversations
+  server/              plateforme web : API FastAPI (comptes, agents, Playground, suivi)
+web/                   application React + TypeScript (site public + application)
 domains/
   imagerie_medicale/   le pack du projet : domain.yaml, data/, workflows/, prompts/,
                        builders/ (scripts de données), tests/ (données S1, gel du test)
@@ -45,6 +47,25 @@ Clés (`.env`, jamais versionné) :
 - **LLM** (facultatif) : toute API compatible OpenAI, ex. Gemini gratuit :
   `LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai`, `LLM_API_KEY`,
   `LLM_MODEL`. Sans LLM, l'agent fonctionne avec les règles seules.
+
+## Plateforme web
+
+Site public (présentation, solutions, démo) et application connectée : tableau de bord,
+configuration des agents, Playground texte / voix, conversations, actions, analytics, base de
+connaissances, réglages. Elle s'appuie sur le moteur existant (aucune intégration dupliquée).
+
+```
+pip install -r requirements.txt          # inclut l'extra [web] (FastAPI, uvicorn)
+cd web && npm install && npm run build   # Node 20+ ; produit web/dist
+cd .. && python -m agentkit.server -v    # http://127.0.0.1:8000  (API : /api/docs)
+```
+
+- Développement de l'interface : `python -m agentkit.server` dans un terminal, `cd web && npm run dev`
+  dans un autre (http://localhost:5173, l'API est relayée).
+- Importer les conversations des essais en ligne de commande (journaux déjà anonymisés) dans
+  un espace de travail : `python -m agentkit.server import-logs --email vous@exemple.com`.
+- Données de la plateforme : `runtime/platform/` (base SQLite, FAQ et agenda propres à chaque agent,
+  audios des réponses). Les clés restent dans `.env`, côté serveur.
 
 ## Commandes
 
@@ -77,6 +98,11 @@ Le jeu de test (`split=test` de `phrases_annotees.csv`) est **gelé** par le tag
 (`domains/imagerie_medicale/data/phrases_aveugles/LISEZMOI.md`).
 
 ## État
+
+Phase 4 (plateforme) : site public + application web multi-entreprises (espaces de travail
+isolés côté serveur, agents = modèle + réglages + FAQ et agenda propres), Playground texte et
+voix branché sur le moteur réel, actions et indicateurs calculés sur les conversations
+enregistrées (anonymisées). Voir `docs/architecture.md` § 12.
 
 Phase 3 : mode `llm_first` (le LLM comprend chaque tour et répond à partir de la FAQ, sources
 vérifiées), dates en ISO, vérification de l'agenda avant le récapitulatif, modèles LLM de

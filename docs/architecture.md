@@ -326,3 +326,27 @@ un gabarit réservé au test.
   `LLM_MAX_TOKENS`.
 - Données entièrement simulées ; journaux anonymisés (slots `pii`, téléphone, e-mail, dates,
   numéro de sécurité sociale) — loi organique n° 2004-63.
+
+## 12. Plateforme web (`src/agentkit/server/`, `web/`)
+
+```
+navigateur (React, web/) ──/api──► FastAPI (server/app.py, api.py)
+                                     ├─ auth : cookie HttpOnly, empreinte du jeton en base, scrypt
+                                     ├─ agents.py : agent = pack (modèle) + réglages + FAQ + agenda propres
+                                     ├─ sessions.py : Orchestrator / AudioChannel existants, un par conversation
+                                     ├─ recorder.py : tours anonymisés, actions, cumuls  ──► SQLite (db.py)
+                                     └─ analytics.py : indicateurs calculés en SQL
+```
+
+| Sujet | Choix |
+|---|---|
+| Locataires | Espace de travail tiré de la session, jamais d'un paramètre ; toute requête SQL filtre `workspace_id`. Chaque agent a sa FAQ (`knowledge_entries`) et son agenda (`runtime/platform/agents/<id>/`). |
+| Agent | Le pack reste la source du comportement. Surchargeables : persona (nom, accueil, style), `llm.mode`, moteur de voix, canaux. FAQ copiée du modèle à la création, puis éditable / importable (CSV). |
+| Conversations | Une session = `Orchestrator(pack effectif, gateway_from_env(), log=False)`. Textes stockés après `Redactor` + mémoire des valeurs `pii` vues ; l'audio de l'appelant n'est pas conservé. Une session fermée sans message est supprimée. |
+| Actions | `trace["action"]` (ajouté dans `Orchestrator._complete` : outil, action, statut, durée) → `succeeded` / `failed` ; récapitulatif en attente → `pending` ; transfert → `requires_human`. |
+| Voix | Le navigateur enregistre en WAV 16 kHz (Web Audio) ; `AudioChannel.handle_audio` inchangé ; STT partagé entre sessions ; au-delà de la limite mensuelle de caractères ElevenLabs de l'espace, gTTS. |
+| Sécurité | En-tête `X-Requested-With` exigé pour toute écriture (CSRF), cookie SameSite=Lax, limitation des tentatives de connexion, aucune clé renvoyée par l'API (`/api/integrations` dit seulement « configuré »). |
+| Pas encore branché | Téléphonie, envoi d'e-mails (réinitialisation : `PLATFORM_EMAIL_MODE=console` en développement), documents dans la base de connaissances, génération d'un agent depuis une description, connecteurs (agenda réel, CRM). Signalé comme tel dans l'interface. |
+
+Tests : `tests/test_server.py` (comptes, CSRF, isolation, FAQ par agent, démarche jusqu'à l'action,
+anonymisation, indicateurs) avec un LLM simulé.

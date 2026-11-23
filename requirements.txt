@@ -7,4 +7,4 @@
 #
 # TTS hors ligne Piper (facultatif, parfois difficile à installer sous Windows) :
 #   pip install -e .[piper]
--e .[audio,ml,app,dev]
+-e .[audio,ml,app,web,dev]

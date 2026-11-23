@@ -40,6 +40,8 @@ piper = ["piper-tts>=1.2"]
 ml = ["torch>=2.4", "sentence-transformers>=3.0"]
 # Démonstrateur (simulation d'appel)
 app = ["gradio>=5.0"]
+# Plateforme web (API FastAPI + application React construite dans web/dist)
+web = ["fastapi>=0.110", "uvicorn>=0.29", "python-multipart>=0.0.9"]
 dev = ["pytest>=8.0", "matplotlib>=3.8"]
 
 [tool.setuptools.packages.find]
