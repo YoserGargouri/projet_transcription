@@ -51,7 +51,10 @@ Clés (`.env`, jamais versionné) :
 | Action | Commande |
 |---|---|
 | Tous les tests (sans réseau, sans crédits) | `python -m pytest` |
-| Conversation texte | `python -m agentkit.channels.text --domaine imagerie_medicale --trace` |
+| Conversation texte (`-v` : étapes STT / LLM / TTS, sans texte ni clé) | `python -m agentkit.channels.text --domaine imagerie_medicale -v` |
+| Appel simulé au micro (audio → audio) | `python -m agentkit.channels.audio --micro 6 --jouer -v` |
+| Scénarios de bout en bout, LLM réel (texte) | `python -m agentkit.evaluation.eval_conversations --mode texte` |
+| Mêmes scénarios en voix (gTTS → Whisper → LLM → ElevenLabs, ≈ 2 500 caractères) | `python -m agentkit.evaluation.eval_conversations --mode voix` |
 | Synthèse d'une phrase (cache : la 2e fois ne coûte rien) | `python -m agentkit.channels.audio.tts --texte "Bonjour" --out sortie.wav --jouer` |
 | Même chose avec gTTS (gratuit) | `python -m agentkit.channels.audio.tts --moteur gtts --out sortie.wav` |
 | Essai de transcription (micro 6 s) | `python -m agentkit.channels.audio.essai_stt --micro 6` |
@@ -73,7 +76,11 @@ Le jeu de test (`split=test` de `phrases_annotees.csv`) est **gelé** par le tag
 `v0-test-gele` ; ne pas le modifier. Un jeu « aveugle » reste à écrire
 (`domains/imagerie_medicale/data/phrases_aveugles/LISEZMOI.md`).
 
-## État (phase 1 : architecture)
+## État
+
+Phase 3 : mode `llm_first` (le LLM comprend chaque tour et répond à partir de la FAQ, sources
+vérifiées), dates en ISO, vérification de l'agenda avant le récapitulatif, modèles LLM de
+secours, journal des étapes (`-v`), scénarios de bout en bout (`results/<pack>/conversations_*.md`).
 
 Phase 2 (WP3) : routage évalué sur le test gelé (99,0 %, 8/8 hors périmètre transférés), FAQ
 hybride avec zone grise confiée à l'appel LLM du tour (0 réponse fausse sur le jeu de mise au point).

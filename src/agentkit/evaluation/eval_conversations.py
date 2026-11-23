@@ -29,7 +29,21 @@ import yaml
 from agentkit import config
 from agentkit.domain import load_domain
 from agentkit.nlu.text import normalise
+from agentkit.llm.gateway import gateway_from_env
 from agentkit.orchestrator import Orchestrator
+
+
+def _agenda_neuf(pack, mode):
+    """Agenda vide propre à cette évaluation (runtime/scenarios/) : les scénarios ne dépendent pas
+    des réservations des essais précédents, et l'agenda simulé habituel n'est pas touché."""
+    outils = []
+    for t in pack.tools:
+        if t.builtin == "calendar":
+            base = config.runtime_dir("scenarios") / f"agenda_{mode}_{t.name}.sqlite"
+            base.unlink(missing_ok=True)
+            t = t.model_copy(update={"config": {**t.config, "database": str(base)}})
+        outils.append(t)
+    return pack.model_copy(update={"tools": outils})
 
 
 def _remplir(texte: str, memo: dict) -> str:
@@ -101,7 +115,7 @@ def main(argv=None):
     sys.stdout.reconfigure(encoding="utf-8")
     config.configurer_journal(args.verbose)
 
-    pack = load_domain(args.domaine)
+    pack = _agenda_neuf(load_domain(args.domaine), args.mode)
     if not pack.evaluation.conversations:
         sys.exit(f"le pack {pack.id} ne déclare pas evaluation.conversations")
     scenarios = yaml.safe_load(pack.path(pack.evaluation.conversations).read_text(encoding="utf-8"))
@@ -130,7 +144,7 @@ def main(argv=None):
 
     memo, lignes, bilan = {}, [], {"tours": 0, "checks": 0, "ok": 0, "llm": 0, "tts_chars": 0}
     for sc in scenarios:
-        orch = Orchestrator.from_domain(args.domaine)
+        orch = Orchestrator(pack, gateway=gateway_from_env())
         if orch.gateway is None:
             sys.exit("aucun LLM configuré (.env) : ce test vérifie justement le LLM")
         orch.warmup()

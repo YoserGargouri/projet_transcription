@@ -137,6 +137,9 @@ class WorkflowEngine:
         args = {k: render(v, run) for k, v in spec.on_complete.arguments.items()}
         pb = self.tools.check(spec.on_complete.tool, spec.on_complete.action, args)
         if pb is None:
+            for arg, valeur in self.tools.canonical(spec.on_complete.tool, spec.on_complete.action, args).items():
+                if m := re.search(r"\{slots\.(\w+)\}", spec.on_complete.arguments.get(arg, "")):
+                    run.slots[m.group(1)] = valeur
             return None
         modele = spec.on_complete.arguments.get(pb.get("argument") or "", "")
         m = re.search(r"\{slots\.(\w+)\}", modele)

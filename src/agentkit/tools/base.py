@@ -53,6 +53,12 @@ class Tool:
         verifier = getattr(self, f"check_{action}", None)
         return verifier(params) if verifier else None
 
+    def canonical(self, action: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        """Valeurs « officielles » de certains arguments une fois l'action vérifiée (ex. la
+        référence telle qu'enregistrée, alors que l'utilisateur l'a dictée approximativement).
+        Le moteur les recopie dans les slots : le récapitulatif répète la bonne valeur."""
+        return {}
+
     def json_schema(self) -> dict[str, Any]:
         """Schéma des actions, pour le prompt / le contrat du LLM."""
         return {"name": self.name, "description": self.description,

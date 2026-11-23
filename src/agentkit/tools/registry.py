@@ -66,5 +66,8 @@ class ToolRegistry:
     def check(self, name: str, action: str, arguments: dict[str, Any]) -> dict[str, Any] | None:
         return self.get(name).check(action, arguments)
 
+    def canonical(self, name: str, action: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        return self.get(name).canonical(action, arguments)
+
     def names(self) -> list[str]:
         return list(self.tools)

@@ -27,6 +27,13 @@ from agentkit import config
 from agentkit.tools.base import Tool, ToolError
 
 JOURS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+# Références dictées au téléphone : sans I, L, O, 0, 1 (confondus à l'oral et par le STT)
+ALPHABET_REF = "".join(c for c in string.ascii_uppercase + string.digits if c not in "ILO01")
+_CONFUSIONS = str.maketrans({"I": "1", "L": "1", "O": "0"})
+
+
+def _cle(reference: str) -> str:
+    return "".join(c for c in str(reference).upper() if c.isalnum()).translate(_CONFUSIONS)
 
 
 class CalendarConfig(BaseModel):
@@ -113,12 +120,18 @@ class CalendarTool(Tool):
         return n == 0
 
     def _ligne(self, reference: str) -> dict:
-        # « rdv a b 12 » dicté au téléphone = « RDV-AB12 » : on compare sans espaces ni tirets
-        cle = "".join(c for c in reference.upper() if c.isalnum())
-        r = self.db.execute("SELECT * FROM bookings WHERE REPLACE(reference, '-', '') = ?", (cle,)).fetchone()
+        """Réservation désignée par une référence DICTÉE puis transcrite : on compare sans espaces
+        ni tirets, en confondant les caractères qui se ressemblent à l'oral et à la transcription
+        (I/1/L, O/0) ; si la transcription ajoute des lettres autour (« c'est RDV... » -> « CRDV... »),
+        une référence connue contenue dans le texte, et une seule, est retenue."""
+        cle = _cle(reference)
+        lignes = self.db.execute("SELECT * FROM bookings").fetchall()
+        cols = ["reference", "resource", "start", "end", "item_id", "contact", "status"]
+        exactes = [r for r in lignes if _cle(r[0]) == cle]
+        contenues = [r for r in lignes if len(_cle(r[0])) >= 6 and _cle(r[0]) in cle]
+        r = exactes[0] if exactes else (contenues[0] if len(contenues) == 1 else None)
         if r is None:
             raise ToolError(f"référence introuvable : {reference}")
-        cols = ["reference", "resource", "start", "end", "item_id", "contact", "status"]
         return dict(zip(cols, r))
 
     def _propositions(self, ressource: str, duree: timedelta, apres: datetime, sauf: str = "",
@@ -186,6 +199,14 @@ class CalendarTool(Tool):
             return {"argument": "reference", "reason": str(e), "options": []}
         return None
 
+    def canonical(self, action, arguments):
+        if "reference" in arguments and action in ("find", "cancel", "move"):
+            try:
+                return {"reference": self._ligne(str(arguments["reference"]))["reference"]}
+            except ToolError:
+                return {}
+        return {}
+
     # ------------------------------------------------------------------ actions -----------
     def free_slots(self, p: FreeSlots) -> dict:
         self._verifier_ressource(p.resource)
@@ -207,7 +228,7 @@ class CalendarTool(Tool):
             raise ToolError("créneau en dehors des horaires d'ouverture")
         if not self._libre(p.resource, p.start, fin):
             raise ToolError("créneau déjà pris")
-        ref = f"{self.cfg.reference_prefix}-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        ref = f"{self.cfg.reference_prefix}-" + "".join(random.choices(ALPHABET_REF, k=6))
         self.db.execute("INSERT INTO bookings VALUES (?, ?, ?, ?, ?, ?, 'booked')",
                         (ref, p.resource, p.start.isoformat(), fin.isoformat(), p.item_id, json.dumps(p.contact)))
         self.db.commit()

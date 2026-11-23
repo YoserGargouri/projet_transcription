@@ -109,6 +109,47 @@ une information fausse non).
 Le routage du premier tour reste sans LLM ; évalué par `eval_router` sur les jeux déclarés
 dans `evaluation.intents` du pack.
 
+## 4 ter. Mode `llm_first` : le LLM comprend chaque tour (phase 3)
+
+Constat sur les premiers appels réels : en `rules_first`, une demande que **aucune règle ne
+reconnaît** est perdue, même quand le LLM l'aurait comprise. « Je voudrais prendre un ronds des
+vous » (ou « … un haut niveau », transcription de Whisper) n'active aucun motif → la FAQ ne
+trouve rien → « Excusez-moi, je n'ai pas bien compris ». Le LLM n'était appelé que pour choisir
+une fiche FAQ (zone grise) ou extraire des slots dans une démarche déjà commencée, et sa
+réponse rédigée était ignorée hors démarche.
+
+Avec `llm.mode: llm_first` (pack imagerie_medicale), l'étape 5 devient **un appel LLM qui
+comprend le tour** — toujours **un seul** par tour (D1) :
+
+| Le LLM reçoit | Le LLM renvoie (contrat pydantic, validé) |
+|---|---|
+| intentions et démarches du pack (en tête de prompt, fixe) ; historique ; date du jour ; démarche en cours, informations obtenues et manquantes ; candidats du catalogue (+ `catalogue.llm_columns`) ; **base de connaissances** (`knowledge.llm_context` : `all` ou `top_k`) ; options proposées par l'outil ; indice des règles ; alerte de périmètre (motif faible) | `intent`, `understood`, `slots` (dates en ISO), `item_code` ∈ candidats, **`sources`** ⊆ fiches/candidats fournis, `asks_for` (information demandée), `analysis` (non lue), `reply`, `sentiment`, `escalate` |
+
+Ce qui **reste hors LLM** : demande d'humain, motifs **forts** du périmètre interdit (transfert
+immédiat, l'appel LLM n'a pas lieu), scripts de sécurité (question et interprétation de la
+réponse), oui/non nets à une confirmation, revalidation de l'élément (D3), validation des
+slots, **vérification par l'outil** avant le récapitulatif (créneau libre, référence existante →
+sinon alternatives `unavailable_message`), récapitulatif, action finale.
+
+**Réponses ancrées dans la base** (`knowledge.answer_mode: grounded`) : le LLM rédige la
+réponse à partir des fiches fournies et doit citer leurs id dans `sources`. Une source hors
+liste est retirée (D3 appliqué aux fiches) ; une réponse d'information **sans source** est
+remplacée par `persona.no_answer_message`. `verbatim` garde l'ancien comportement (fiche lue mot
+pour mot).
+
+**Repli** : si le LLM échoue (surcharge 503/429, délai, sortie invalide), le tour repart sur
+le chemin `rules_first` (règles, résolveur, FAQ par zones, analyse de dates de secours
+`nlu/dates.py`). `LLM_FALLBACK_MODELS` : modèles de secours essayés tout de suite, dans le
+budget `LLM_TIMEOUT_S`.
+
+**Transcriptions fautives** : le prompt du pack prévient le LLM que le message vient d'un STT
+(« ronds des vous » = « rendez-vous ») ; `channels.audio.stt.prompt` donne aussi le vocabulaire
+du métier à Whisper.
+
+Le routeur par règles reste **évalué seul** (`eval_router`, exigence de la spec) ; il est
+désormais l'indice et le repli de l'agent. Le comportement de bout en bout est mesuré par
+`eval_conversations` (scénarios du pack, en texte et en voix).
+
 ## 5. Contrat de sortie de l'agent (D3)
 
 Le modèle pydantic de la sortie est **généré à chaque tour** à partir du pack
@@ -176,8 +217,8 @@ branche d'évaluation `rdv_existant` pour annuler / déplacer / consulter).
 ### 6.5 Connaissances, workflows, outils
 | Champ | Rôle |
 |---|---|
-| `knowledge` | FAQ CSV : colonnes `id` / `question` / `reponse` / `variantes` ; `retriever` (`tfidf` / `embeddings` / `hybrid`), `embeddings_model`, `lexical_weight`, `min_score`, `min_gap`, `llm_margin`, `llm_top_k` |
-| `evaluation` | jeux d'évaluation : `intents[]` (`file`, `text_column`, `label_column`, `split_column`, `out_of_scope_column`, `escalate_label`), `knowledge[]` (`file`, `text_column`, `expected_column`, `blind`) |
+| `knowledge` | FAQ CSV : colonnes `id` / `question` / `reponse` / `variantes` ; `retriever` (`tfidf` / `embeddings` / `hybrid`), `embeddings_model`, `lexical_weight`, `min_score`, `min_gap`, `llm_margin`, `llm_top_k` ; **`answer_mode`** (`verbatim` / `grounded`) ; **`llm_context`** (`top_k` / `all`) |
+| `evaluation` | jeux d'évaluation : `intents[]` (`file`, `text_column`, `label_column`, `split_column`, `out_of_scope_column`, `escalate_label`), `knowledge[]` (`file`, `text_column`, `expected_column`, `blind`), **`conversations`** (YAML de scénarios de bout en bout) |
 | `workflows[]` | chemin d'un YAML ou définition inline : `id`, `description`, `slots[]` (`name`, `type`, `required`, `prompt`, `pii`, `choices`, `pattern`), `confirmation`, `on_complete` (`tool`, `action`, `arguments` avec `{slots.x}`, `{item.x}`), `success_message` (`{result.x}`) |
 | `tools[]` | `name` + **`builtin`** (outil du moteur, configuré par `config`) **ou** `entrypoint` (`tools/<fichier>.py:<Classe>`, dans le pack, liste blanche) |
 
@@ -185,6 +226,11 @@ Outil intégré `calendar` (D4) : `resources` ou `resource_attribute` (chaque va
 attribut = une ressource), **`duration_field`** (colonne du catalogue donnant la durée),
 `default_duration_min`, `slot_step_min`, `horizon_days`, `reference_prefix`, `opening_hours`
 (`mon`…`sun` → plages `HH:MM-HH:MM`). Actions : `free_slots`, `book`, `find`, `cancel`, `move`.
+Vérifications sans écriture (`Tool.check`, appelées avant le récapitulatif) : créneau passé,
+hors horaires ou pris → 3 alternatives espacées ; référence inconnue ou déjà annulée. Les
+références sont comparées sans espaces ni tirets (« R D V tiret A B 1 2 » = `RDV-AB12`).
+Les slots `date` / `time` / `datetime` sont stockés en ISO et lus en toutes lettres dans les
+messages (« jeudi 26 novembre à 10 heures »).
 
 ### 6.6 Signaux, escalade, sécurité, réponses
 | Champ | Rôle |
@@ -198,11 +244,15 @@ attribut = une ressource), **`duration_field`** (colonne du catalogue donnant la
 | Champ | Rôle |
 |---|---|
 | `channels.audio.stt.engine` | `whisper-small`, `vosk`, `elevenlabs`… |
+| `channels.audio.stt.prompt` | vocabulaire du métier donné à Whisper (`initial_prompt`) |
 | `channels.audio.tts` | `engine`, `voice_id`, `model_id`, `fallback`, `settings` |
 | `channels.audio.quality` | seuils : durée, niveau, SNR, confiance STT |
 | `channels.audio.retry_message` | phrase quand l'audio est inexploitable |
 | `llm.system_prompt` | texte ou fichier du pack ; `{persona_name}`, `{scope}`, `{style}` remplacés |
 | `llm.max_history_turns` | historique envoyé au LLM |
+| `llm.mode` | `rules_first` (règles d'abord, LLM en secours) / `llm_first` (le LLM comprend chaque tour, § 4 ter) |
+| `persona.no_answer_message`, `persona.unavailable_message` | pas de source dans la base ; valeur refusée par l'outil (`{options}`) |
+| `catalogue.llm_columns` | colonnes montrées au LLM avec chaque candidat, citables dans `sources` |
 | `logging.extra_patterns` | motifs à masquer en plus des génériques |
 
 ## 7. Ajouter un domaine, pas à pas

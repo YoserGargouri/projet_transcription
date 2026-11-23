@@ -199,3 +199,23 @@ def test_jour_de_la_semaine_et_lecture():
     assert dates.dire("2026-11-26T09:30", "fr") == "jeudi 26 novembre à 9 heures 30"
     assert dates.dire("2026-12-01T12:00", "fr") == "mardi 1er décembre à midi"
     assert dates.option_choisie("la deuxième", ["2026-11-26T09:00", "2026-11-26T11:00"]) == "2026-11-26T11:00"
+
+
+def test_reference_transcrite_avec_confusions():
+    """Transcriptions réelles de Whisper : « RDV-M8ZI3I » dicté -> « CRDV-M8Z13I » (c'est + I/1)."""
+    from agentkit.tools.builtin.calendar import ALPHABET_REF
+
+    o = Orchestrator(load_domain("imagerie_medicale"))
+    ref = o.tools.call("agenda", "book", {"resource": "Échographie", "start": prochain_mardi("16:00")})["reference"]
+    assert all(c in ALPHABET_REF for c in ref.split("-")[1])          # ni I, L, O, 0, 1
+    agenda = o.tools.get("agenda")
+    corps = ref.split("-")[1]
+    assert agenda._ligne("C" + ref)["reference"] == ref                # « c'est RDV... »
+    assert agenda._ligne(" ".join(ref))["reference"] == ref            # lettre par lettre
+    with pytest.raises(Exception):
+        agenda._ligne("RDV-ZZZZZZ")
+    assert agenda._ligne("rdv " + corps.lower())["reference"] == ref
+
+    o2, _ = orch([sortie("annuler_rdv", "D'accord.", slots={"reference": "C" + ref})])
+    r = o2.handle_text("je veux annuler")
+    assert r.reply == f"J'annule le rendez-vous {ref}. Vous confirmez ?"     # la vraie référence est relue
