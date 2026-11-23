@@ -99,7 +99,8 @@ def verifier_fichiers(pack: DomainPack) -> list[str]:
         if not fichier.exists():
             return [f"catalogue introuvable : {c.file}"]
         cat = pd.read_csv(fichier, keep_default_na=False, dtype=str)
-        attendues = [c.id_column, c.label_column, *c.synonym_columns, *(a.column for a in c.attributes)]
+        attendues = [c.id_column, c.label_column, *c.synonym_columns, *(a.column for a in c.attributes),
+                     *c.llm_columns]
         err += [f"catalogue : colonne absente {col}" for col in attendues if col not in cat.columns]
         if not err and cat[c.id_column].duplicated().any():
             err.append("catalogue : identifiants en double")
@@ -141,6 +142,8 @@ def verifier_fichiers(pack: DomainPack) -> list[str]:
         else:
             cols = _colonnes(pack.path(fichier))
             err += [f"évaluation {jid} : colonne absente {c}" for c in colonnes if c and c not in cols]
+    if pack.evaluation.conversations and not pack.path(pack.evaluation.conversations).exists():
+        err.append(f"évaluation : scénarios introuvables {pack.evaluation.conversations}")
     for t in pack.tools:
         if t.entrypoint and not pack.path(t.entrypoint.split(":")[0]).exists():
             err.append(f"outil {t.name} : fichier introuvable {t.entrypoint}")

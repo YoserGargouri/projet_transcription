@@ -82,6 +82,9 @@ def _modele_conversationnel(intents, slot_names, candidates, knowledge_ids, aska
     if knowledge_ids:
         champs["sources"] = (list[_litteral(knowledge_ids)], Field(default_factory=list))
     champs["asks_for"] = ((_litteral(askable_slots) | None) if askable_slots else type(None), None)
+    # Écrite AVANT reply (les champs sont générés dans l'ordre) : le modèle pose les faits avant de
+    # répondre, ce qui évite les réponses contradictoires des petits modèles. Jamais dite à l'utilisateur.
+    champs["analysis"] = (str, Field("", max_length=400))
     champs["reply"] = (str, Field(min_length=1))
     champs["sentiment"] = (_litteral(SENTIMENTS), "neutre")
     champs["escalate"] = (EscalateFlag, Field(default_factory=EscalateFlag))

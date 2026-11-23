@@ -230,6 +230,8 @@ catalogue:
     column_question: question_desambiguisation
   confidence: {accept: 0.75, confirm: 0.5, confusable_penalty: 0.7}
   shortlist_size: 15
+  # Montrées au LLM avec chaque examen candidat : il peut répondre « faut-il être à jeun ? »
+  llm_columns: [preparation, duree_min]
 
 knowledge:
   file: data/faq/faq.csv
@@ -366,3 +368,4 @@ evaluation:
     - id: faq_dev
       file: data/faq/faq_dev.csv
       blind: false
+  conversations: data/scenarios/conversations.yaml

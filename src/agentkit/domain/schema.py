@@ -173,6 +173,10 @@ class CatalogueSpec(Strict):
     confusions: ConfusionsSpec | None = None
     confidence: ConfidenceSettings = Field(default_factory=ConfidenceSettings)
     shortlist_size: int = Field(15, ge=2, le=50, description="Candidats max montrés au LLM")
+    llm_columns: list[str] = Field(default_factory=list,
+                                   description="Colonnes du catalogue montrées au LLM avec chaque candidat "
+                                               "(ex. préparation, durée) : il peut y répondre en citant le code "
+                                               "du candidat dans sources, comme une fiche de la base")
     options_joiner: str = Field(" ou ", description="Mot placé avant la dernière option d'une question")
 
     @model_validator(mode="after")
@@ -381,6 +385,8 @@ class KnowledgeDatasetSpec(Strict):
 class EvaluationSpec(Strict):
     intents: list[IntentDatasetSpec] = Field(default_factory=list)
     knowledge: list[KnowledgeDatasetSpec] = Field(default_factory=list)
+    conversations: str | None = Field(None, description="YAML de scénarios de bout en bout (texte ou voix), "
+                                                        "joués par agentkit.evaluation.eval_conversations")
 
 
 # --- Le pack ----------------------------------------------------------------------------------

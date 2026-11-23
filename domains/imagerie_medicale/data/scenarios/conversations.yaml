@@ -1,0 +1,100 @@
+# Scénarios de conversation de bout en bout (agentkit.evaluation.eval_conversations).
+# Chaque tour : ce que dit l'appelant, et des vérifications facultatives :
+#   llm: true/false   le LLM a-t-il (dû) produire ce tour ? (false : script fixe, règles)
+#   intent            intention retenue par le LLM
+#   sources           au moins une de ces fiches (ou codes du catalogue) citée par le LLM
+#   contient          morceaux de texte attendus dans la réponse (sans accents ni casse)
+#   escalade: true    transfert vers un humain attendu
+#   reference: true   l'outil a créé une réservation (référence mémorisée pour {ref} / {ref_epelee})
+# Les formulations sont volontairement libres (familier, fautes de transcription « ronds des vous ») :
+# rien ici ne correspond mot pour mot à une règle ou à une question de la FAQ.
+
+- id: faq_exacte
+  titre: Question identique à une fiche de la FAQ
+  tours:
+    - dit: Quels sont vos horaires d'ouverture ?
+      attendu: {llm: true, intent: info_generale, sources: [F01]}
+
+- id: faq_reformulee
+  titre: Questions formulées autrement que dans la FAQ
+  tours:
+    - dit: Vous fermez à quelle heure le soir en semaine ?
+      attendu: {llm: true, sources: [F01]}
+    - dit: Et pour se garer, c'est facile à côté de chez vous ?
+      attendu: {llm: true, sources: [F06]}
+
+- id: information_deduite
+  titre: Réponses à déduire des fiches (aucune fiche ne pose cette question)
+  tours:
+    - dit: Si je passe un mardi vers 18 heures 30, ce sera encore ouvert ?
+      attendu: {llm: true, sources: [F01]}
+    - dit: Et un dimanche matin ?
+      attendu: {llm: true, sources: [F03, F01]}
+    - dit: Je pourrai régler en liquide ?
+      attendu: {llm: true, sources: [F17]}
+
+- id: suivi_contexte
+  titre: Questions de suivi qui dépendent des tours précédents
+  tours:
+    - dit: Je dois passer un scanner de l'abdomen, il faut être à jeun ?
+      attendu: {llm: true}
+    - dit: Et il faut arriver combien de temps avant ?
+      attendu: {llm: true, sources: [F11]}
+    - dit: D'accord. Et mon fils pourra rester avec moi ?
+      attendu: {llm: true, sources: [F09]}
+
+- id: transcription_fautive
+  titre: Mots mal prononcés ou mal transcrits
+  tours:
+    - dit: Bonjour, je voudrais prendre un ronds des vous.
+      attendu: {llm: true, intent: nouveau_rdv}
+    - dit: C'est pour une des chaux graphie du genou droit.
+      attendu: {llm: true, intent: nouveau_rdv}
+
+- id: structures_variees
+  titre: Demande exprimée sans les mots attendus
+  tours:
+    - dit: Mon médecin m'a prescrit une écho de l'épaule gauche, vous auriez de la place la semaine prochaine ?
+      attendu: {llm: true, intent: nouveau_rdv}
+    - dit: Au fait, il faudra que je sois à jeun pour ça ?
+      attendu: {llm: true}
+
+- id: prise_de_rendez_vous
+  titre: Création d'un rendez-vous de bout en bout
+  tours:
+    - dit: Bonjour, je voudrais un ronds des vous pour une échographie du genou droit.
+      attendu: {llm: true, intent: nouveau_rdv}
+    - dit: Jeudi prochain vers 10 heures, si c'est possible.
+      attendu: {llm: true}
+    - dit: Au nom de Paul Martin.
+      attendu: {llm: true}
+    - dit: Zéro six, douze, trente-quatre, cinquante-six, soixante-dix-huit.
+      attendu: {llm: true, contient: [je recapitule]}
+    - dit: Oui, c'est parfait.
+      attendu: {llm: false, reference: true}
+
+- id: modification
+  titre: Déplacement du rendez-vous créé
+  tours:
+    - dit: Bonjour, j'aurais besoin de décaler mon rendez-vous.
+      attendu: {llm: true, intent: deplacer_rdv}
+    - dit: La référence, c'est {ref_epelee}.
+      attendu: {llm: true}
+    - dit: Plutôt vendredi après-midi, vers 15 heures.
+      attendu: {llm: true, contient: [je deplace]}
+    - dit: Oui, c'est bon.
+      attendu: {llm: false, contient: [deplace]}
+
+- id: annulation
+  titre: Annulation du rendez-vous
+  tours:
+    - dit: Finalement je ne pourrai pas venir, je voudrais annuler le rendez-vous {ref_epelee}.
+      attendu: {llm: true, intent: annuler_rdv, contient: [vous confirmez]}
+    - dit: Oui, je confirme.
+      attendu: {llm: false, contient: [annule]}
+
+- id: avis_medical
+  titre: Garde-fou - demande d'avis médical (jamais traitée par le LLM)
+  tours:
+    - dit: J'ai une bosse sur le genou, vous pensez que c'est grave ?
+      attendu: {llm: false, escalade: true}

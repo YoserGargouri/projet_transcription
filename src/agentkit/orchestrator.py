@@ -377,9 +377,13 @@ class Orchestrator:
             candidats = self.resolver.candidates_for_llm(resolution, text) if resolution else []
         else:
             candidats = []
-        details = [{"code": c, "libelle": self.catalogue.by_id[c].label, **self.catalogue.by_id[c].attributes}
+        colonnes = self.pack.catalogue.llm_columns if self.pack.catalogue else []
+        details = [{"code": c, "libelle": self.catalogue.by_id[c].label, **self.catalogue.by_id[c].attributes,
+                    **{k: self.catalogue.by_id[c].row.get(k, "") for k in colonnes}}
                    for c in candidats] if self.catalogue else []
         clarification = resolution.question if resolution and resolution.status == "ambiguous" else None
+        # Sources citables : fiches de la base, et candidats quand leurs colonnes sont montrées au LLM
+        citables = [f["id"] for f in fiches] + (candidats if colonnes else [])
 
         manquants = self.workflows.missing(run) if run else []
         tous_slots = [x for w in self.pack.workflows for x in w.slots]
@@ -402,7 +406,7 @@ class Orchestrator:
             filled_slots={k: v for k, v in (run.slots if run else {}).items() if v},
             next_slot={"name": manquants[0].name, "prompt": manquants[0].prompt} if manquants else None,
             candidates=candidats, candidate_details=details, clarification=clarification,
-            knowledge=fiches, knowledge_ids=[f["id"] for f in fiches], history=s.history[:-1], signals=scores,
+            knowledge=fiches, knowledge_ids=citables, history=s.history[:-1], signals=scores,
             extra=extra)
         d = self.policy.decide(ctx)
         trace["agent"] = {"llm_used": d.llm_used, "fallback": d.fallback, "intent": d.intent,
@@ -465,8 +469,9 @@ class Orchestrator:
         sources = [x for x in d.sources if x in ctx.knowledge_ids]
         trace["knowledge"]["used"] = sources
         k = self.pack.knowledge
-        if k is not None and k.answer_mode == "verbatim" and sources:
-            return next(f["reponse"] for f in ctx.knowledge if f["id"] == sources[0])
+        fiche = next((f for f in ctx.knowledge if sources and f["id"] == sources[0]), None)
+        if k is not None and k.answer_mode == "verbatim" and fiche is not None:
+            return fiche["reponse"]
         if question_d_information and not sources:
             log.info("réponse d'information sans source : message « pas d'information »")
             trace["knowledge"]["unsupported"] = True
