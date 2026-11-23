@@ -577,6 +577,7 @@ def conversations(agent_id: str | None = None, channel: str | None = None, outco
                   date_to: str | None = Query(None, alias="to"), page: int = Query(1, ge=1),
                   page_size: int = Query(25, ge=1, le=100), ctx: Ctx = Depends(current),
                   p: Platform = Depends(platform)):
+    p.sessions.expire_idle()                # conversations abandonnées (onglet fermé) : closes avant affichage
     w, params = ["c.workspace_id = ?"], [ctx.ws]
     for col, v in (("agent_id", agent_id), ("channel", channel), ("outcome", outcome), ("source", source)):
         if v:
@@ -699,6 +700,7 @@ def get_analytics(date_from: str | None = Query(None, alias="from"), date_to: st
 
 @router.get("/dashboard")
 def dashboard(days: int = Query(14, ge=1, le=90), ctx: Ctx = Depends(current), p: Platform = Depends(platform)):
+    p.sessions.expire_idle()
     debut, fin = _plage(None, None, days)
     recentes = p.db.all("""SELECT c.*, (julianday(c.last_activity_at) - julianday(c.started_at)) * 86400 AS duration_s
                            FROM conversations c WHERE workspace_id = ? ORDER BY started_at DESC LIMIT 6""", (ctx.ws,))

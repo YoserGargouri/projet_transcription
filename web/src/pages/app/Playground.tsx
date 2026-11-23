@@ -23,7 +23,8 @@ interface Msg {
   error?: boolean;
 }
 
-const nowIso = () => new Date().toISOString().slice(0, 19);
+// Local wall-clock time, same format as the server timestamps ("2026-11-23T22:47:15", no zone)
+const nowIso = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 19);
 let seq = 0;
 const mid = () => `m${++seq}`;
 
@@ -83,7 +84,18 @@ function Session({ agentId, agentName }: { agentId: string; agentName: string })
 
   useEffect(() => {
     start();
-    return () => end();
+    // Tab closed or page reloaded: React does not unmount, so tell the server explicitly.
+    // keepalive lets the request outlive the page and still carry the CSRF header.
+    const onHide = () => {
+      const id = sessionRef.current;
+      if (id) fetch(`/api/playground/sessions/${id}/end`, { method: "POST", keepalive: true, headers: { "X-Requested-With": "fetch" } }).catch(() => {});
+      sessionRef.current = null;
+    };
+    window.addEventListener("pagehide", onHide);
+    return () => {
+      window.removeEventListener("pagehide", onHide);
+      end();
+    };
   }, [start, end]);
 
   useEffect(() => {

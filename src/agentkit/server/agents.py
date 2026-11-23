@@ -51,7 +51,9 @@ def list_templates() -> list[dict]:
             log.warning("modèle ignoré %s : %s", dossier.name, str(e).splitlines()[0])
             continue
         modeles.append(describe_template(pack))
-    return modeles
+    # le plus complet d'abord (voix, nombre de démarches) : c'est lui que l'assistant de création
+    # présélectionne ; un pack de démonstration minimal ne doit pas être le choix par défaut
+    return sorted(modeles, key=lambda m: (not m["voice"], -len(m["workflows"]), m["name"]))
 
 
 def describe_template(pack: DomainPack) -> dict:
