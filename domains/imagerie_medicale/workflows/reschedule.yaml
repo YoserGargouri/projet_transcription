@@ -1,0 +1,18 @@
+# Déplacer un rendez-vous existant (branche rdv_existant). Phase 1 : slots et action finale.
+id: reschedule
+description: déplacer un rendez-vous existant
+slots:
+  - name: reference
+    type: reference
+    prompt: Pouvez-vous me donner la référence de votre rendez-vous ? Elle figure dans le message de confirmation.
+  - name: nouveau_creneau
+    type: datetime
+    prompt: Quel nouveau jour et quel moment vous conviendraient ?
+confirmation: "Je déplace le rendez-vous {slots.reference} : {slots.nouveau_creneau}. C'est bien cela ?"
+on_complete:
+  tool: agenda
+  action: move
+  arguments:
+    reference: "{slots.reference}"
+    new_start: "{slots.nouveau_creneau}"
+success_message: "C'est fait, votre rendez-vous {slots.reference} est déplacé."

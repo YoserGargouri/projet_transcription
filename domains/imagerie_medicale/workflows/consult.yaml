@@ -1,0 +1,13 @@
+# Retrouver ou confirmer un rendez-vous existant (branche rdv_existant).
+id: consult
+description: retrouver la date et l'heure d'un rendez-vous existant
+slots:
+  - name: reference
+    type: reference
+    prompt: Pouvez-vous me donner la référence de votre rendez-vous ?
+on_complete:
+  tool: agenda
+  action: find
+  arguments:
+    reference: "{slots.reference}"
+success_message: "Votre rendez-vous {result.reference} est prévu le {result.start}."

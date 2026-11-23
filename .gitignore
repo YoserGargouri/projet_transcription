@@ -1,0 +1,37 @@
+
+# Environnement Python
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# Secrets : jamais versionnés (modèle : .env.example)
+.env
+
+# Modèles volumineux (Whisper, Vosk, embeddings...) ; les petits modèles entraînés
+# par l'équipe seront ajoutés explicitement (exception à écrire en phase 4)
+models/
+
+# Audios : bruts non versionnés, sauf les échantillons de test choisis
+domains/*/data/audio/*
+!domains/*/data/audio/test_samples/
+!domains/*/data/audio/test_samples/**
+
+# Données temporaires
+domains/*/data/tmp/
+domains/*/data/raw/
+
+# Fichiers générés à l'exécution : caches, agendas simulés, journaux, résultats
+.cache/
+runtime/
+logs/
+results/
+domains/*/data/results/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Système
+.DS_Store
+Thumbs.db

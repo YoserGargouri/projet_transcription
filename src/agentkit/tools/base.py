@@ -1,0 +1,65 @@
+"""
+Outils : actions que l'agent peut déclencher (réserver, annuler, chercher...).
+
+Un outil expose des « actions », chacune décrite par un modèle pydantic de paramètres :
+le schéma JSON sert au contrat du LLM, la validation protège l'exécution.
+
+    class MonOutil(Tool):
+        actions = {"creer": ParamsCreer}
+        def creer(self, p: ParamsCreer) -> dict: ...
+
+    outil.call("creer", {"x": 1})   # valide les paramètres puis appelle la méthode creer
+"""
+from __future__ import annotations
+
+from typing import Any, ClassVar
+
+from pydantic import BaseModel, ValidationError
+
+
+class ToolError(Exception):
+    """Échec d'un outil (paramètres invalides, élément introuvable, créneau pris...)."""
+
+
+class Tool:
+    actions: ClassVar[dict[str, type[BaseModel]]] = {}
+    description: ClassVar[str] = ""
+
+    def __init__(self, name: str, config: dict[str, Any] | None = None, pack=None):
+        self.name = name
+        self.config = config or {}
+        self.pack = pack
+
+    def call(self, action: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        if action not in self.actions:
+            raise ToolError(f"outil {self.name} : action inconnue {action!r} ({', '.join(self.actions)})")
+        try:
+            params = self.actions[action](**arguments)
+        except ValidationError as e:
+            raise ToolError(f"outil {self.name}.{action} : paramètres invalides : {e.errors()}") from e
+        return getattr(self, action)(params)
+
+    def check(self, action: str, arguments: dict[str, Any]) -> dict[str, Any] | None:
+        """L'action serait-elle acceptée ? None = oui (ou vérification non prévue par l'outil) ;
+        sinon {"argument": nom de l'argument fautif, "reason": ..., "options": [alternatives]}.
+        Appelé avant le récapitulatif, pour ne pas faire confirmer une action impossible."""
+        if action not in self.actions:
+            return None
+        try:
+            params = self.actions[action](**arguments)
+        except ValidationError as e:
+            loc = e.errors()[0]["loc"]
+            return {"argument": str(loc[0]) if loc else None, "reason": "valeur invalide", "options": []}
+        verifier = getattr(self, f"check_{action}", None)
+        return verifier(params) if verifier else None
+
+    def canonical(self, action: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        """Valeurs « officielles » de certains arguments une fois l'action vérifiée (ex. la
+        référence telle qu'enregistrée, alors que l'utilisateur l'a dictée approximativement).
+        Le moteur les recopie dans les slots : le récapitulatif répète la bonne valeur."""
+        return {}
+
+    def json_schema(self) -> dict[str, Any]:
+        """Schéma des actions, pour le prompt / le contrat du LLM."""
+        return {"name": self.name, "description": self.description,
+                "actions": {a: m.model_json_schema() for a, m in self.actions.items()}}

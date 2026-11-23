@@ -1,0 +1,30 @@
+# Prise d'un nouveau rendez-vous (branche nouveau_rdv).
+# Phase 1 : slots et action finale. TODO(WP6) : proposer les créneaux libres de l'agenda,
+# faire choisir le créneau, rappeler la préparation.
+id: booking
+description: prendre un rendez-vous pour un examen du catalogue
+slots:
+  - name: examen
+    type: catalogue_item
+    prompt: Quel examen devez-vous passer ? Vous pouvez me lire l'intitulé de votre ordonnance.
+  - name: creneau
+    type: datetime
+    prompt: Quel jour et à quel moment de la journée vous conviendraient le mieux ?
+  - name: nom
+    type: text
+    pii: true
+    prompt: À quel nom dois-je enregistrer le rendez-vous ?
+  - name: telephone
+    type: phone
+    pii: true
+    prompt: À quel numéro de téléphone peut-on vous joindre ?
+confirmation: "Je récapitule : {item.libelle}, {slots.creneau}, au nom de {slots.nom}. Je confirme le rendez-vous ?"
+on_complete:
+  tool: agenda
+  action: book
+  arguments:
+    resource: "{item.modalite}"
+    start: "{slots.creneau}"
+    item_id: "{item.code}"
+    contact: "{slots.nom} {slots.telephone}"
+success_message: "C'est noté, votre référence est {result.reference}. Pensez à apporter votre ordonnance. Préparation : {item.preparation}."

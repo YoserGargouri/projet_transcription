@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentkit"
+version = "0.1.0"
+description = "Moteur d'agent conversationnel configurable par packs de domaine (premier cas d'usage : centre d'appel d'imagerie médicale)"
+readme = "README.md"
+requires-python = ">=3.11"
+# Le moteur seul : configuration, routage, résolution, LLM, outils, journaux
+dependencies = [
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "requests>=2.31",
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "rapidfuzz>=3.6",
+    "scikit-learn>=1.4",
+]
+
+[project.optional-dependencies]
+# Canal audio : STT (Whisper, Vosk, ElevenLabs), qualité, TTS (ElevenLabs, gTTS)
+audio = [
+    "faster-whisper>=1.1",
+    "vosk>=0.3.45",
+    "jiwer>=3.0",
+    "librosa>=0.10",
+    "soundfile>=0.12",
+    "scipy>=1.11",
+    "huggingface_hub>=0.24",
+    "gTTS>=2.5",
+    "elevenlabs>=2.0",
+    "sounddevice>=0.5",
+]
+# TTS hors ligne : difficile à installer sur certains Windows, donc séparé
+piper = ["piper-tts>=1.2"]
+# Modèles entraînés (détecteur de frustration, WP5)
+ml = ["torch>=2.4", "sentence-transformers>=3.0"]
+# Démonstrateur (simulation d'appel)
+app = ["gradio>=5.0"]
+# Plateforme web (API FastAPI + application React construite dans web/dist)
+web = ["fastapi>=0.110", "uvicorn>=0.29", "python-multipart>=0.0.9"]
+dev = ["pytest>=8.0", "matplotlib>=3.8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+# Les tests de chaque pack de domaine vivent dans le pack
+testpaths = ["tests", "domains"]
+addopts = "--import-mode=importlib"

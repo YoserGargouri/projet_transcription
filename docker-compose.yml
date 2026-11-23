@@ -1,0 +1,20 @@
+# Lancement :   docker compose up --build        puis http://localhost:8000
+# Clés : copier .env.example en .env et le remplir (jamais versionné, jamais copié dans l'image).
+services:
+  platform:
+    build:
+      context: .
+      args:
+        PRELOAD_MODELS: "0"          # "1" : Whisper et le modèle d'embeddings inclus dans l'image
+    image: agentkit-platform:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false              # sans .env : l'agent fonctionne avec les règles seules
+    volumes:
+      - agentkit-data:/data          # comptes, conversations, agendas, audios, caches de modèles
+    restart: unless-stopped
+
+volumes:
+  agentkit-data:

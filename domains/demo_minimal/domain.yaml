@@ -1,0 +1,93 @@
+# Pack minimal (location de vélos), utilisé seulement par les tests : il prouve que le moteur
+# fonctionne avec un autre métier sans changer une ligne de src/agentkit.
+schema_version: 1
+id: demo_minimal
+name: Location de vélos (démo)
+description: Réservation de vélos de location et questions pratiques.
+language: fr
+
+persona:
+  name: l'assistant de la boutique de location
+  greeting: Bonjour, je peux réserver un vélo pour vous ou répondre à une question.
+  style: Phrases courtes, tutoiement interdit.
+  handoff_message: Je vous passe un vendeur.
+  fallback_message: Je n'ai pas compris, pouvez-vous reformuler ?
+
+scope:
+  description: réserver un vélo de location et donner des informations pratiques.
+  allowed: [réservation de vélos, horaires, tarifs]
+  forbidden:
+    - id: reparation
+      description: diagnostic de panne ou réparation
+      patterns: ['\b(panne|repar)']
+  human_request_patterns: ['\bparler a (un|une) (vendeur|vendeuse|humain)\b']
+
+intents:
+  - id: autre
+    description: hors sujet
+    handler: escalate
+    default: true
+  - id: info
+    description: question pratique
+    handler: knowledge
+    priority: 20
+    patterns: ['\bhoraires?\b', '\b(prix|coute|tarif)', '\bcaution\b']
+  - id: louer
+    description: réserver un vélo
+    handler: workflow:location
+    priority: 10
+    patterns: ['\b(louer|location|reserver)\b', '\bvelo\b', '\bvtt\b']
+
+catalogue:
+  file: data/catalogue.csv
+  id_column: code
+  label_column: libelle
+  attributes:
+    - name: type
+      column: type
+      question: Quel type de vélo souhaitez-vous, {options} ?
+      option_labels: {ville: de ville, vtt: un VTT, electrique: électrique, enfant: enfant, cargo: cargo}
+    - name: taille
+      match_values: false
+      column: taille
+      question: Quelle taille, {options} ?
+      option_labels: {S: petite, M: moyenne, L: grande}
+  gazetteer: data/gazetteer.yaml
+
+knowledge:
+  file: data/faq.csv
+  min_score: 0.3
+
+workflows:
+  - workflows/location.yaml
+
+tools:
+  - name: reservation
+    entrypoint: tools/reservation.py:ReservationFictive
+    description: enregistre une réservation (factice, en mémoire)
+
+signals:
+  - id: frustration
+    patterns: ['\b(marre|nul|repet)']
+    threshold: 0.5
+
+escalation:
+  signal_thresholds: {frustration: 0.9}
+
+safety_scripts:
+  - id: age_electrique
+    applies_if: {type: [electrique]}
+    question: La personne qui roulera a-t-elle moins de 14 ans ?
+
+answers:
+  positive: ['^(oui|ouais|d accord|ok)\b', '\boui\b']
+  negative: ['^(non|nan)\b', '\bnon\b']
+
+channels:
+  audio:
+    tts: {engine: gtts}
+
+llm:
+  system_prompt: >
+    Tu es {persona_name}. Ton rôle : {scope}. Réponds en JSON selon le schéma ; choisis le vélo
+    uniquement parmi les candidats fournis, sinon null.

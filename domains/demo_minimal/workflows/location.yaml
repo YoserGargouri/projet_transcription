@@ -1,0 +1,22 @@
+id: location
+description: réserver un vélo pour une date
+slots:
+  - name: velo
+    type: catalogue_item
+    prompt: Quel vélo voulez-vous louer ?
+  - name: date
+    type: date
+    prompt: Pour quelle date ?
+  - name: nom
+    type: text
+    pii: true
+    prompt: À quel nom ?
+confirmation: "Je réserve : {item.libelle}, {slots.date}, au nom de {slots.nom}. D'accord ?"
+on_complete:
+  tool: reservation
+  action: creer
+  arguments:
+    velo: "{item.code}"
+    date: "{slots.date}"
+    nom: "{slots.nom}"
+success_message: "Réservation {result.numero} enregistrée."
